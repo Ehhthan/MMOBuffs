@@ -1,0 +1,6 @@
+name: MMOStatusEffects
+version: '${project.version}'
+main: com.ehhthan.mmostatuseffects.MMOStatusEffects
+api-version: 1.17
+depend: [ MythicLib ]
+authors: [ Ehhthan ]
