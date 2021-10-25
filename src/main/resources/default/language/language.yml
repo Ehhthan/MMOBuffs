@@ -7,5 +7,4 @@ player-not-found: '<red>Player was not found.'
 
 reload-command: '<green>Successfully reloaded MMOBuffs.'
 
-permanent-text: "Permanent"
-duration-text: "<days>d <hours>h <minutes>m <seconds>s"
+permanent-display: "Permanent"

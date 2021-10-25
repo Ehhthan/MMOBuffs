@@ -1,11 +1,15 @@
 package com.ehhthan.mmobuffs.api.effect.duration;
 
+import com.ehhthan.mmobuffs.MMOBuffs;
+import com.ehhthan.mmobuffs.api.effect.display.Displayable;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.Template;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.time.Instant;
 
-public class EffectDuration {
+public class EffectDuration implements Displayable {
     protected final int seconds;
     protected final Instant creation;
 
@@ -32,6 +36,11 @@ public class EffectDuration {
 
     public EffectDuration merge(@NotNull EffectDuration duration) {
         return new EffectDuration(getSecondsLeft() + duration.getSecondsLeft());
+    }
+
+    @Override
+    public Component getDisplay() {
+        return Component.text(toString());
     }
 
     // TODO: 10/20/2021 make this configurable

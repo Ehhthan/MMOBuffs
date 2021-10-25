@@ -1,6 +1,8 @@
 package com.ehhthan.mmobuffs.api.effect.duration;
 
+import com.ehhthan.mmobuffs.api.effect.display.Displayable;
 import com.ehhthan.mmobuffs.MMOBuffs;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
@@ -32,9 +34,8 @@ public class PermanentDuration extends EffectDuration {
         return this;
     }
 
-    // TODO: 10/20/2021 make this configurable
     @Override
-    public String toString() {
-        return "Permanent";
+    public Component getDisplay() {
+        return MMOBuffs.getInst().getLanguageManager().getMessage("permanent-display", false);
     }
 }

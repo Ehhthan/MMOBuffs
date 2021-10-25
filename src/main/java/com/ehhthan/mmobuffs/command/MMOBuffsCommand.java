@@ -12,6 +12,7 @@ public class MMOBuffsCommand extends Command<MMOBuffs> {
         super(MMOBuffs.getInst());
 
         this.addSubCommands(new ReloadCommand(this));
+        this.addSubCommands(new AddEffectCommand(this));
     }
 
     @Override
@@ -22,9 +23,13 @@ public class MMOBuffsCommand extends Command<MMOBuffs> {
 
     @Override
     public List<String> onTabComplete(CommandSender commandSender, String[] strings) {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("reload");
-        return list;
+        if (strings.length == 0) {
+            ArrayList<String> list = new ArrayList<>();
+            list.add("reload");
+            list.add("add");
+            return list;
+        }
+        return null;
     }
 
     @Override
