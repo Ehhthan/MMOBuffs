@@ -1,0 +1,11 @@
+# GLOBAL
+prefix: '<#3c4345>[<#53d46c>MMOBuffs<#3c4345>] '
+
+# GLOBAL COMMANDS
+unknown-command: '<red>Unknown command.'
+player-not-found: '<red>Player was not found.'
+
+reload-command: '<green>Successfully reloaded MMOBuffs.'
+
+permanent-text: "Permanent"
+duration-text: "<days>d <hours>h <minutes>m <seconds>s"

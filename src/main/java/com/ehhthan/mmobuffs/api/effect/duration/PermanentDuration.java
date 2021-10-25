@@ -29,7 +29,7 @@ public class PermanentDuration extends EffectDuration {
     @Override
     public EffectDuration merge(@NotNull EffectDuration duration) {
         MMOBuffs.getInst().getLogger().log(Level.WARNING, "PermanentDurations should not be attempted to be merged.");
-        return duration;
+        return this;
     }
 
     // TODO: 10/20/2021 make this configurable

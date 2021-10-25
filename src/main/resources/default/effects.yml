@@ -1,0 +1,10 @@
+test:
+  max-stacks: 4
+  stack-type: "normal"
+  stats:
+    defense: 10
+    armor: 1
+    max-health: -1
+  display:
+    icon: "\uF000"
+    text: "<green> <icon> <time>"

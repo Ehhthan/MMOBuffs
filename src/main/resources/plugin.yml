@@ -1,6 +1,14 @@
-name: MMOStatusEffects
+name: MMOBuffs
 version: '${project.version}'
-main: com.ehhthan.mmostatuseffects.MMOStatusEffects
-api-version: 1.17
+main: com.ehhthan.mmobuffs.MMOBuffs
+api-version: 1.16
 depend: [ MythicLib ]
 authors: [ Ehhthan ]
+commands:
+  mmobuffs:
+    description: Main mmobuffs command.
+    aliases: [buff, buffs, mmob, mmobuff]
+permissions:
+  mmobuffs.reload:
+    description: Access to /mmobuffs reload
+    default: op

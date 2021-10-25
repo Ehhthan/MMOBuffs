@@ -1,4 +1,4 @@
-package com.ehhthan.mmobuffs.api;
+package com.ehhthan.mmobuffs.api.effect.stack;
 
 public enum StackType {
     /**

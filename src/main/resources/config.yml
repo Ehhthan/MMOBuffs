@@ -1,4 +1,8 @@
-# This is the name of the resource-pack namespace that mmobuffs stores
-# it's assets in. (Fonts and stuff.)
-#
-pack-namespace: "mmobuffs"
+resource-pack:
+  enabled: true
+  # This is the name of the resource-pack namespace that mmobuffs stores
+  # it's assets in. (Fonts and stuff.)
+  #
+  namespace: "mmobuffs"
+
+config-version: 1
