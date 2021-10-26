@@ -1,5 +1,7 @@
 package com.ehhthan.mmobuffs.manager;
 
+import org.apache.commons.lang.Validate;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -46,6 +48,7 @@ public abstract class KeyedManager<T> extends Manager<T> {
     }
 
     public T get(String key) {
-        return managed.get(key.toLowerCase(Locale.ROOT));
+        Validate.isTrue(has(key), "Effect does not exist.");
+        return managed.get(Keyable.format(key));
     }
 }

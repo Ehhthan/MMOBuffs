@@ -26,9 +26,9 @@ public class StatusEffect implements Keyable {
     public StatusEffect(@NotNull ConfigurationSection section) {
         this.key = Keyable.format(section.getName());
 
-        Validate.isTrue(section.isConfigurationSection("stats"));
-
-        this.statData = new StatData(section.getConfigurationSection("stats"));
+        this.statData = (section.isConfigurationSection("stats"))
+            ? new StatData(section.getConfigurationSection("stats"))
+            : null;
 
         this.maxStacks = section.getInt("max-stacks", 1);
         this.stackType = StackType.valueOf(section.getString("stack-type", "NORMAL").toUpperCase(Locale.ROOT));
@@ -41,6 +41,10 @@ public class StatusEffect implements Keyable {
     @Override
     public String getKey() {
         return key;
+    }
+
+    public boolean hasStatData() {
+        return statData != null;
     }
 
     public StatData getStatData() {

@@ -1,6 +1,6 @@
 package com.ehhthan.mmobuffs.api.effect.display;
 
-import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
+import com.ehhthan.mmobuffs.api.effect.StatusEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -25,7 +25,7 @@ public class EffectDisplay {
     }
 
     // TODO: 10/20/2021 add value ph
-    public Component build(@NotNull ActiveStatusEffect effect) {
+    public Component build(@NotNull StatusEffect effect) {
         return MiniMessage.get().parse(StringEscapeUtils.unescapeJava(text), "time", effect.getDuration().toString(), "icon", icon);
     }
 }
