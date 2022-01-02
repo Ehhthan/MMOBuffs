@@ -11,6 +11,12 @@ public enum Modifier {
     REPLACE,
 
     /**
+     * If the player already has the specified effect, do not modify anything. If the player
+     * does not have this effect, then apply it normally.
+     */
+    KEEP,
+
+    /**
      * Refreshes the duration of the effect, only if the remaining duration on the player
      * is lower than the time specified in the command. If the remaining duration of the
      * effect is higher, do nothing. If a different <value> is specified in this command,
@@ -28,10 +34,5 @@ public enum Modifier {
      * Subtracts the specified time from the remaining duration of the effect. This also keeps
      * the <value> on the player and ignores the one specified in the command.
      */
-    SUBTRACT,
-    /**
-     * If the player already has the specified effect, do not modify anything. If the player
-     * does not have this effect, then apply it normally.
-     */
-    KEEP
+    SUBTRACT
 }

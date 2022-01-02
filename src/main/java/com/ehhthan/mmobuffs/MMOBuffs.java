@@ -1,22 +1,32 @@
 package com.ehhthan.mmobuffs;
 
+import co.aikar.commands.InvalidCommandArgument;
+import co.aikar.commands.PaperCommandManager;
+import com.ehhthan.mmobuffs.api.EffectHolder;
+import com.ehhthan.mmobuffs.api.effect.StatusEffect;
 import com.ehhthan.mmobuffs.command.MMOBuffsCommand;
 import com.ehhthan.mmobuffs.manager.type.ConfigManager;
 import com.ehhthan.mmobuffs.manager.type.EffectManager;
 import com.ehhthan.mmobuffs.manager.type.LanguageManager;
-import io.lumine.mythic.utils.plugin.LuminePlugin;
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
-public final class MMOBuffs extends LuminePlugin {
-    private static MMOBuffs plugin;
-
-
+public final class MMOBuffs extends JavaPlugin {
     private ConfigManager configManager;
     private LanguageManager languageManager;
     private EffectManager effectManager;
 
+    private static MMOBuffs INSTANCE;
+
+    public static MMOBuffs getInst() {
+        return INSTANCE;
+    }
+
     @Override
-    public void enable() {
-        plugin = this;
+    public void onEnable() {
+        INSTANCE = this;
         saveDefaultConfig();
 
         final int configVersion = getConfig().contains("config-version", true) ? getConfig().getInt("config-version") : -1;
@@ -27,11 +37,48 @@ public final class MMOBuffs extends LuminePlugin {
                 + defConfigVersion + "')");
         }
 
-        this.registerCommand("mmobuffs", new MMOBuffsCommand());
-
-        this.configManager = new ConfigManager();
+        this.configManager = new ConfigManager(this);
         this.languageManager = new LanguageManager();
         this.effectManager = new EffectManager();
+
+        getServer().getPluginManager().registerEvents(new EffectHolder.PlayerListener(), this);
+
+        registerCommands();
+    }
+
+    private void registerCommands() {
+        PaperCommandManager commandManager = new PaperCommandManager(this);
+
+        commandManager.getCommandCompletions().registerAsyncCompletion("effects",
+            c -> MMOBuffs.getInst().getEffectManager().keys().stream().map(NamespacedKey::getKey).toList());
+
+        commandManager.getCommandContexts().registerContext(StatusEffect.class, c -> {
+            String arg = c.getFirstArg();
+            NamespacedKey key = arg != null ? NamespacedKey.fromString(arg, this) : null;
+
+            if (key == null || !effectManager.has(key)) {
+                throw new InvalidCommandArgument("Invalid status effect specified.");
+            } else {
+                c.popFirstArg();
+            }
+
+            return effectManager.get(key);
+        });
+
+        commandManager.getCommandContexts().registerContext(EffectHolder.class, c -> {
+            String arg = c.getFirstArg();
+            Player player = arg != null ? Bukkit.getPlayer(arg) : null;
+
+            if (!EffectHolder.has(player)) {
+                throw new InvalidCommandArgument("Invalid effect holder specified.");
+            } else {
+                c.popFirstArg();
+            }
+
+            return EffectHolder.get(player);
+        });
+
+        commandManager.registerCommand(new MMOBuffsCommand(this, languageManager));
     }
 
     public void reload() {
@@ -39,10 +86,6 @@ public final class MMOBuffs extends LuminePlugin {
 
         languageManager.reload();
         effectManager.reload();
-    }
-
-    public static MMOBuffs getInst() {
-        return plugin;
     }
 
     public ConfigManager getConfigManager() {

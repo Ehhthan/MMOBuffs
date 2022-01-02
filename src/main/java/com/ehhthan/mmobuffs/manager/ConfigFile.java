@@ -1,4 +1,4 @@
-package com.ehhthan.mmobuffs.file;
+package com.ehhthan.mmobuffs.manager;
 
 import com.ehhthan.mmobuffs.MMOBuffs;
 import org.bukkit.configuration.file.FileConfiguration;

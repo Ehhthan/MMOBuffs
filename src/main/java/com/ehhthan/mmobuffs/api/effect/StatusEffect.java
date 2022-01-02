@@ -1,21 +1,19 @@
 package com.ehhthan.mmobuffs.api.effect;
 
-import com.ehhthan.mmobuffs.api.effect.stack.StackType;
+import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.effect.display.EffectDisplay;
+import com.ehhthan.mmobuffs.api.effect.stack.StackType;
 import com.ehhthan.mmobuffs.api.effect.stat.StatData;
-import com.ehhthan.mmobuffs.manager.Keyable;
-import net.Indyuce.mmoitems.MMOItems;
-import net.Indyuce.mmoitems.stat.type.DoubleStat;
-import net.Indyuce.mmoitems.stat.type.ItemStat;
-import org.apache.commons.lang.Validate;
+import org.bukkit.Keyed;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
-public class StatusEffect implements Keyable {
-    private final String key;
+public class StatusEffect implements Keyed {
+    private final NamespacedKey key;
     private final StatData statData;
 
     private final int maxStacks;
@@ -24,7 +22,7 @@ public class StatusEffect implements Keyable {
     private final EffectDisplay display;
 
     public StatusEffect(@NotNull ConfigurationSection section) {
-        this.key = Keyable.format(section.getName());
+        this.key = NamespacedKey.fromString(section.getName().toLowerCase(Locale.ROOT), MMOBuffs.getInst());
 
         this.statData = (section.isConfigurationSection("stats"))
             ? new StatData(section.getConfigurationSection("stats"))
@@ -39,7 +37,7 @@ public class StatusEffect implements Keyable {
     }
 
     @Override
-    public String getKey() {
+    public @NotNull NamespacedKey getKey() {
         return key;
     }
 
@@ -47,7 +45,7 @@ public class StatusEffect implements Keyable {
         return statData != null;
     }
 
-    public StatData getStatData() {
+    public @Nullable StatData getStatData() {
         return statData;
     }
 

@@ -1,10 +1,23 @@
 # GLOBAL
 prefix: '<#3c4345>[<#53d46c>MMOBuffs<#3c4345>] '
 
-# GLOBAL COMMANDS
+# COMMANDS
 unknown-command: '<red>Unknown command.'
 player-not-found: '<red>Player was not found.'
 
 reload-command: '<green>Successfully reloaded MMOBuffs.'
 
-permanent-display: "Permanent"
+applied-effect: 'You have received a <effect> Status Effect with <stacks> stacks and a duration of <duration>.'
+
+# DISPLAYS
+duration-display:
+  days: '<value>d'
+  hours: '<value>h'
+  minutes: '<value>m'
+  seconds: '<value>s'
+
+  # What should separate the time placeholders.
+  separator: ' '
+
+  permanent: 'Permanent'
+

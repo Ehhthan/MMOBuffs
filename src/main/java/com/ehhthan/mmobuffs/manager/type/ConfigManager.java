@@ -8,7 +8,11 @@ import java.nio.file.Files;
 import java.util.logging.Level;
 
 public final class ConfigManager {
-    public ConfigManager() {
+    private final MMOBuffs plugin;
+
+    public ConfigManager(MMOBuffs plugin) {
+        this.plugin = plugin;
+
         mkdir("language");
 
         for (DefaultFile file : DefaultFile.values())
@@ -16,10 +20,10 @@ public final class ConfigManager {
     }
 
     private void mkdir(String path) {
-        File folder = new File(MMOBuffs.getInst().getDataFolder() + "/" + path);
+        File folder = new File(plugin.getDataFolder() + "/" + path);
         if (!folder.exists())
             if (!folder.mkdir())
-                MMOBuffs.getInst().getLogger().log(Level.WARNING, "Could not create directory.");
+                plugin.getLogger().log(Level.WARNING, "Could not create directory.");
     }
 
     /*
@@ -33,24 +37,27 @@ public final class ConfigManager {
 
         private final String folderPath, fileName, resourceName;
 
+        private final MMOBuffs plugin;
+
         DefaultFile(String resourceName, String folderPath, String fileName) {
             this.resourceName = resourceName;
             this.folderPath = folderPath;
             this.fileName = fileName;
+            this.plugin = MMOBuffs.getInst();
         }
 
         public void checkFile() {
             File file = getFile();
             if (!file.exists())
                 try {
-                    Files.copy(MMOBuffs.getInst().getResource("default/" + resourceName), file.getAbsoluteFile().toPath());
+                    Files.copy(plugin.getResource("default/" + resourceName), file.getAbsoluteFile().toPath());
                 } catch (IOException exception) {
                     exception.printStackTrace();
                 }
         }
 
         public File getFile() {
-            return new File(MMOBuffs.getInst().getDataFolder() + (folderPath.equals("") ? "" : "/" + folderPath), fileName);
+            return new File(plugin.getDataFolder() + (folderPath.equals("") ? "" : "/" + folderPath), fileName);
         }
     }
 }

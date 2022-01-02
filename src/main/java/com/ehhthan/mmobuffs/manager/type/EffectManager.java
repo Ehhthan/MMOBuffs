@@ -1,7 +1,7 @@
 package com.ehhthan.mmobuffs.manager.type;
 
 import com.ehhthan.mmobuffs.api.effect.StatusEffect;
-import com.ehhthan.mmobuffs.file.ConfigFile;
+import com.ehhthan.mmobuffs.manager.ConfigFile;
 import com.ehhthan.mmobuffs.manager.KeyedManager;
 import com.ehhthan.mmobuffs.manager.Reloadable;
 

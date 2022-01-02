@@ -1,6 +1,6 @@
 package com.ehhthan.mmobuffs.manager.type;
 
-import com.ehhthan.mmobuffs.file.ConfigFile;
+import com.ehhthan.mmobuffs.manager.ConfigFile;
 import com.ehhthan.mmobuffs.manager.Reloadable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -19,9 +19,20 @@ public final class LanguageManager implements Reloadable {
         this.language = new ConfigFile("/language", "language");
     }
 
+    public String getString(@NotNull String path) {
+        String found = language.getConfig().getString(path);
+
+        if (found != null && (found.isEmpty() || found.equals("[]")))
+            return "";
+
+        return found == null ? "<MNF:" + path + ">" : found;
+    }
+
+    @Nullable
     public Component getMessage(@NotNull String path) {
         return getMessage(path, true);
     }
+
     @Nullable
     public Component getMessage(@NotNull String path, boolean hasPrefix, Template... templates) {
         String prefix = (hasPrefix) ? language.getConfig().getString("prefix", "") : "";

@@ -1,6 +1,6 @@
 package com.ehhthan.mmobuffs.api.effect.stat;
 
-import org.apache.commons.lang.Validate;
+import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +17,7 @@ public class StatData {
                 stats.put(format(key), section.getDouble(key));
         }
 
-        Validate.isTrue(stats.size() > 0, "0 stats are assigned.");
+        Preconditions.checkArgument(stats.size() > 0, "0 stats are assigned.");
     }
 
     public boolean hasStat(String stat) {

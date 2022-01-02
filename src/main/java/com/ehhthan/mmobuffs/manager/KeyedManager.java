@@ -1,14 +1,15 @@
 package com.ehhthan.mmobuffs.manager;
 
-import org.apache.commons.lang.Validate;
+import com.google.common.base.Preconditions;
+import org.bukkit.Keyed;
+import org.bukkit.NamespacedKey;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public abstract class KeyedManager<T> extends Manager<T> {
-    protected final Map<String, T> managed = new LinkedHashMap<>();
+    protected final Map<NamespacedKey, T> managed = new LinkedHashMap<>();
 
     @Override
     public Collection<T> values() {
@@ -27,28 +28,28 @@ public abstract class KeyedManager<T> extends Manager<T> {
 
     @Override
     public void register(T property) {
-        if (property instanceof Keyable)
-            managed.put(((Keyable) property).getKey(), property);
+        if (property instanceof Keyed)
+            managed.put(((Keyed) property).getKey(), property);
     }
 
-    public void register(String key, T property) {
+    public void register(NamespacedKey key, T property) {
         managed.put(key, property);
     }
 
-    public void registerAll(Map<String, T> properties) {
+    public void registerAll(Map<NamespacedKey, T> properties) {
         managed.putAll(properties);
     }
 
-    public Collection<String> keys() {
+    public Collection<NamespacedKey> keys() {
         return managed.keySet();
     }
 
-    public boolean has(String key) {
-        return managed.containsKey(Keyable.format(key));
+    public boolean has(NamespacedKey key) {
+        return managed.containsKey(key);
     }
 
-    public T get(String key) {
-        Validate.isTrue(has(key), "Effect does not exist.");
-        return managed.get(Keyable.format(key));
+    public T get(NamespacedKey key) {
+        Preconditions.checkArgument(has(key), "Effect does not exist.");
+        return managed.get(key);
     }
 }
