@@ -38,7 +38,7 @@ public enum StackType {
 
     /**
      * Removes a stack if the player both attacks something or damages something. (Basically
-     * onAttack and onHit combined together). Removed if duration runs out, and also does not multiply <value>
+     * onAttack and onHit combined). Removed if duration runs out, and also does not multiply <value>
      */
     COMBAT
 }

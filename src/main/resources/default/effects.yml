@@ -1,17 +1,10 @@
-test:
+strong:
   max-stacks: 4
   stack-type: normal
-#  stats:
-#    defense: 10
-#    armor: 1
-#    max-health: -1
-  display:
-    icon: \uE000
-    text: "<icon> <duration>"
-
-test2:
-  max-stacks: 1
-  stack-type: normal
+  stats:
+    defense: 10
+    armor: 1
+    max-health: 2
   display:
     icon: \uE001
     text: "<icon> <duration>"

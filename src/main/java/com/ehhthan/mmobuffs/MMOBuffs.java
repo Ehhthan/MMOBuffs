@@ -5,18 +5,28 @@ import co.aikar.commands.PaperCommandManager;
 import com.ehhthan.mmobuffs.api.EffectHolder;
 import com.ehhthan.mmobuffs.api.effect.StatusEffect;
 import com.ehhthan.mmobuffs.command.MMOBuffsCommand;
+import com.ehhthan.mmobuffs.comp.placeholderapi.MMOBuffsExpansion;
+import com.ehhthan.mmobuffs.comp.stat.StatHandler;
+import com.ehhthan.mmobuffs.comp.stat.type.MythicLibStatHandler;
+import com.ehhthan.mmobuffs.listener.CombatListener;
+import com.ehhthan.mmobuffs.listener.WorldListener;
 import com.ehhthan.mmobuffs.manager.type.ConfigManager;
 import com.ehhthan.mmobuffs.manager.type.EffectManager;
 import com.ehhthan.mmobuffs.manager.type.LanguageManager;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.logging.Level;
+
 public final class MMOBuffs extends JavaPlugin {
     private ConfigManager configManager;
     private LanguageManager languageManager;
     private EffectManager effectManager;
+
+    private StatHandler<?> statHandler;
 
     private static MMOBuffs INSTANCE;
 
@@ -41,7 +51,19 @@ public final class MMOBuffs extends JavaPlugin {
         this.languageManager = new LanguageManager();
         this.effectManager = new EffectManager();
 
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new MMOBuffsExpansion().register();
+            getLogger().log(Level.INFO, "PlaceholderAPI support detected.");
+        }
+
+        if (Bukkit.getPluginManager().getPlugin("MythicLib") != null) {
+            this.statHandler = new MythicLibStatHandler();
+            getLogger().log(Level.INFO, "MythicLib stat support detected.");
+        }
+
         getServer().getPluginManager().registerEvents(new EffectHolder.PlayerListener(), this);
+        getServer().getPluginManager().registerEvents(new WorldListener(), this);
+        getServer().getPluginManager().registerEvents(new CombatListener(), this);
 
         registerCommands();
     }
@@ -98,5 +120,9 @@ public final class MMOBuffs extends JavaPlugin {
 
     public EffectManager getEffectManager() {
         return effectManager;
+    }
+
+    public StatHandler<?> getStatHandler() {
+        return statHandler;
     }
 }

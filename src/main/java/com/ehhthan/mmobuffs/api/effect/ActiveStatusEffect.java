@@ -1,5 +1,6 @@
 package com.ehhthan.mmobuffs.api.effect;
 
+import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.effect.display.duration.DurationDisplay;
 import com.ehhthan.mmobuffs.api.effect.display.duration.TimedDisplay;
 import com.ehhthan.mmobuffs.api.effect.stack.StackType;
@@ -7,33 +8,31 @@ import com.ehhthan.mmobuffs.api.modifier.Modifier;
 import com.google.common.base.Preconditions;
 
 public class ActiveStatusEffect {
-    private final StatusEffect effect;
+    private final StatusEffect statusEffect;
     private final int startDuration;
     private final int startStacks;
 
     private int duration;
     private int stacks;
-    private final boolean displayable;
     private final boolean permanent;
 
     private final DurationDisplay durationDisplay;
     private boolean active = true;
 
-    private ActiveStatusEffect(EffectBuilder builder) {
-        this.effect = builder.effect;
+    private ActiveStatusEffect(ActiveEffectBuilder builder) {
+        this.statusEffect = builder.effect;
         this.startDuration = builder.startDuration;
         this.startStacks = builder.startStacks;
 
         this.duration = builder.duration;
         this.stacks = builder.stacks;
-        this.displayable = builder.displayable;
         this.permanent = builder.permanent;
 
         this.durationDisplay = (permanent) ? DurationDisplay.PERMANENT : new TimedDisplay(this);
     }
 
-    public StatusEffect getEffect() {
-        return effect;
+    public StatusEffect getStatusEffect() {
+        return statusEffect;
     }
 
     public int getStartDuration() {
@@ -52,10 +51,6 @@ public class ActiveStatusEffect {
         return stacks;
     }
 
-    public boolean isDisplayable() {
-        return displayable;
-    }
-
     public DurationDisplay getDurationDisplay() {
         return durationDisplay;
     }
@@ -68,11 +63,15 @@ public class ActiveStatusEffect {
         return active;
     }
 
-    public void tick() {
+    public double getStatValue(String key) {
+        return MMOBuffs.getInst().getStatHandler().getValue(this, key);
+    }
+
+    public boolean tick() {
         if (!permanent && active) {
             this.duration--;
             if (duration <= 0) {
-                StackType stackType = effect.getStackType();
+                StackType stackType = statusEffect.getStackType();
 
                 switch (stackType) {
                     case NORMAL, ATTACK, HURT, COMBAT -> {
@@ -80,13 +79,27 @@ public class ActiveStatusEffect {
                         this.active = false;
                     }
                     case CASCADING, TIMESTACK -> {
-                        if (this.stacks == 0) {
+                        this.stacks--;
+                        if (this.stacks <= 0) {
                             this.active = false;
                         } else {
-                            this.stacks--;
                             this.duration = startDuration;
+                            return true;
                         }
                     }
+                }
+            }
+        }
+        return false;
+    }
+
+    public void tickStackEvent(StackType type) {
+        if (active && type == statusEffect.getStackType()) {
+            switch (type) {
+                case ATTACK, HURT, COMBAT -> {
+                    this.stacks--;
+                    if (stacks <= 0)
+                        this.active = false;
                 }
             }
         }
@@ -97,12 +110,12 @@ public class ActiveStatusEffect {
     }
 
     public void setStacks(int stacks) {
-        this.stacks = Math.max(0, Math.min(stacks, effect.getMaxStacks()));
+        this.stacks = Math.max(0, Math.min(stacks, statusEffect.getMaxStacks()));
     }
 
     public ActiveStatusEffect merge(Modifier modifier, ActiveStatusEffect latest) {
-        Preconditions.checkArgument(effect.getKey() == latest.effect.getKey(),
-            "Effects of two different types cannot be merged: %s + %s", effect.getKey(), latest.effect.getKey());
+        Preconditions.checkArgument(statusEffect.getKey() == latest.statusEffect.getKey(),
+            "Effects of two different types cannot be merged: %s + %s", statusEffect.getKey(), latest.statusEffect.getKey());
 
         switch (modifier) {
             case REPLACE -> {
@@ -145,30 +158,28 @@ public class ActiveStatusEffect {
         if (startStacks != effect1.startStacks) return false;
         if (duration != effect1.duration) return false;
         if (stacks != effect1.stacks) return false;
-        if (displayable != effect1.displayable) return false;
         if (permanent != effect1.permanent) return false;
         if (active != effect1.active) return false;
-        return effect.equals(effect1.effect);
+        return statusEffect.equals(effect1.statusEffect);
     }
 
     @Override
     public int hashCode() {
-        int result = effect.hashCode();
+        int result = statusEffect.hashCode();
         result = 31 * result + startDuration;
         result = 31 * result + startStacks;
         result = 31 * result + duration;
         result = 31 * result + stacks;
-        result = 31 * result + (displayable ? 1 : 0);
         result = 31 * result + (permanent ? 1 : 0);
         result = 31 * result + (active ? 1 : 0);
         return result;
     }
 
-    public static EffectBuilder builder(StatusEffect effect) {
-        return new EffectBuilder(effect);
+    public static ActiveEffectBuilder builder(StatusEffect statusEffect) {
+        return new ActiveEffectBuilder(statusEffect);
     }
 
-    public static class EffectBuilder {
+    public static class ActiveEffectBuilder {
         private final StatusEffect effect;
 
         private int startDuration = 0;
@@ -176,51 +187,44 @@ public class ActiveStatusEffect {
 
         private int duration = -1;
         private int stacks = -1;
-        private boolean displayable = true;
         private boolean permanent = false;
 
-        EffectBuilder(StatusEffect effect) {
+        ActiveEffectBuilder(StatusEffect effect) {
             this.effect = effect;
         }
 
-        EffectBuilder(ActiveStatusEffect activeEffect) {
-            this.effect = activeEffect.effect;
+        ActiveEffectBuilder(ActiveStatusEffect activeEffect) {
+            this.effect = activeEffect.statusEffect;
             this.startDuration = activeEffect.startDuration;
             this.startStacks = activeEffect.startStacks;
 
             this.duration = activeEffect.duration;
             this.stacks = activeEffect.stacks;
-            this.displayable = activeEffect.displayable;
             this.permanent = activeEffect.permanent;
         }
 
-        public EffectBuilder startDuration(int startDuration) {
+        public ActiveEffectBuilder startDuration(int startDuration) {
             this.startDuration = startDuration;
             return this;
         }
 
-        public EffectBuilder startStacks(int startStacks) {
+        public ActiveEffectBuilder startStacks(int startStacks) {
             this.startStacks = Math.min(effect.getMaxStacks(), startStacks);
             return this;
         }
 
 
-        public EffectBuilder duration(int duration) {
+        public ActiveEffectBuilder duration(int duration) {
             this.duration = Math.max(0, duration);
             return this;
         }
 
-        public EffectBuilder stacks(int stacks) {
+        public ActiveEffectBuilder stacks(int stacks) {
             this.stacks = Math.max(0, Math.min(stacks, effect.getMaxStacks()));
             return this;
         }
 
-        public EffectBuilder displayable(boolean displayable) {
-            this.displayable = displayable;
-            return this;
-        }
-
-        public EffectBuilder permanent(boolean permanent) {
+        public ActiveEffectBuilder permanent(boolean permanent) {
             this.permanent = permanent;
             return this;
         }

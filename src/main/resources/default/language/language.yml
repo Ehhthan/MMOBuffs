@@ -7,8 +7,6 @@ player-not-found: '<red>Player was not found.'
 
 reload-command: '<green>Successfully reloaded MMOBuffs.'
 
-applied-effect: 'You have received a <effect> Status Effect with <stacks> stacks and a duration of <duration>.'
-
 # DISPLAYS
 duration-display:
   days: '<value>d'

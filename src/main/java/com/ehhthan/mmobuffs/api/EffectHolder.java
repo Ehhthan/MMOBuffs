@@ -4,6 +4,7 @@ import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import com.ehhthan.mmobuffs.api.modifier.Modifier;
 import com.ehhthan.mmobuffs.api.tag.CustomTagTypes;
+import com.ehhthan.mmobuffs.comp.stat.StatHandler;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -52,7 +53,7 @@ public class EffectHolder implements PersistentDataHolder {
             ActiveStatusEffect[] savedEffects = getPersistentDataContainer().get(EFFECTS, CustomTagTypes.ACTIVE_EFFECTS);
             if (savedEffects != null && savedEffects.length > 0)
                 for (ActiveStatusEffect effect : savedEffects) {
-                    effects.put(effect.getEffect().getKey(), effect);
+                    addEffect(Modifier.REPLACE, effect);
                 }
         }
 
@@ -67,11 +68,14 @@ public class EffectHolder implements PersistentDataHolder {
                 if (effects.size() > 0) {
                     Collection<ActiveStatusEffect> values = effects.values();
                     for (ActiveStatusEffect activeEffect : values) {
-                        activeEffect.tick();
+                        NamespacedKey key = activeEffect.getStatusEffect().getKey();
+                        if (activeEffect.tick()) {
+                            updateEffect(key);
+                        }
 
                         if (!activeEffect.isActive())
-                            effects.remove(activeEffect.getEffect().getKey());
-                        else if (activeEffect.isDisplayable())
+                            removeEffect(key);
+                        else if (activeEffect.getStatusEffect().hasDisplay())
                             display = true;
                     }
                     save();
@@ -80,13 +84,15 @@ public class EffectHolder implements PersistentDataHolder {
                 if (config.getBoolean("bossbar-display.enabled", true) && display) {
                     TextComponent.Builder builder = Component.text();
 
-                    List<ActiveStatusEffect> sortedEffects = EffectHolder.this.effects.values().stream().sorted(Comparator.comparingInt(ActiveStatusEffect::getDuration)).toList();
+                    List<ActiveStatusEffect> sortedEffects = effects.values().stream().sorted(Comparator.comparingInt(ActiveStatusEffect::getDuration)).toList();
                     for (int i = 0; i < sortedEffects.size(); i++) {
                         ActiveStatusEffect effect = sortedEffects.get(i);
-                        builder.append(effect.getEffect().getDisplay().build(effect));
+                        if (effect.getStatusEffect().hasDisplay()) {
+                            builder.append(effect.getStatusEffect().getDisplay().build(player, effect));
 
-                        if (i != sortedEffects.size() - 1) {
-                            builder.append(Component.text(config.getString("bossbar-display.effect-separator", " ")));
+                            if (i != sortedEffects.size() - 1) {
+                                builder.append(Component.text(config.getString("bossbar-display.effect-separator", " ")));
+                            }
                         }
                     }
 
@@ -108,21 +114,35 @@ public class EffectHolder implements PersistentDataHolder {
         getPersistentDataContainer().set(EFFECTS, CustomTagTypes.ACTIVE_EFFECTS, activeStatusEffects);
     }
 
+    public void updateEffect(NamespacedKey key) {
+        ActiveStatusEffect activeEffect = getEffect(key);
+        if (activeEffect.getStatusEffect().hasStats()) {
+            MMOBuffs.getInst().getStatHandler().edit(EffectHolder.this, StatHandler.EditType.ADD, activeEffect);
+        }
+    }
+
     public void addEffect(Modifier modifier, ActiveStatusEffect effect) {
-        NamespacedKey key = effect.getEffect().getKey();
+        NamespacedKey key = effect.getStatusEffect().getKey();
+
         if (effects.containsKey(key)) {
             effects.put(key, effects.get(key).merge(modifier, effect));
         } else {
             effects.put(key, effect);
         }
-    }
-
-    public void removeEffect(ActiveStatusEffect effect) {
-        removeEffect(effect.getEffect().getKey());
+        if (effect.getStatusEffect().hasStats())
+            MMOBuffs.getInst().getStatHandler().edit(this, StatHandler.EditType.ADD, effect);
     }
 
     public void removeEffect(NamespacedKey key) {
+        ActiveStatusEffect activeEffect = getEffect(key);
+        if (activeEffect.getStatusEffect().hasStats())
+            MMOBuffs.getInst().getStatHandler().edit(this, StatHandler.EditType.REMOVE, activeEffect);
         effects.remove(key);
+    }
+
+    public void removeAllEffects(boolean includePermanent) {
+        for (NamespacedKey key : getEffectsKeys(includePermanent))
+            removeEffect(key);
     }
 
     public boolean hasEffect(NamespacedKey key) {
@@ -133,13 +153,17 @@ public class EffectHolder implements PersistentDataHolder {
         return effects.get(key);
     }
 
-    public List<NamespacedKey> getEffects(boolean includePermanent) {
+    public List<NamespacedKey> getEffectsKeys(boolean includePermanent) {
+        return getEffects(includePermanent).stream().map(effect -> effect.getStatusEffect().getKey()).toList();
+    }
+
+    public Collection<ActiveStatusEffect> getEffects(boolean includePermanent) {
         Collection<ActiveStatusEffect> values = effects.values();
 
         if (!includePermanent)
             values.removeIf(ActiveStatusEffect::isPermanent);
 
-        return values.stream().map(effect -> effect.getEffect().getKey()).toList();
+        return values;
     }
 
     public static EffectHolder get(Player player) {
@@ -185,7 +209,6 @@ public class EffectHolder implements PersistentDataHolder {
 
         @EventHandler
         public void onLeave(PlayerQuitEvent e) {
-            DATA.get(e.getPlayer()).save();
             DATA.remove(e.getPlayer());
         }
     }

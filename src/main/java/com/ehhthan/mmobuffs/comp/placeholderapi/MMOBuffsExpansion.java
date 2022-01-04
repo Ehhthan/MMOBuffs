@@ -37,15 +37,67 @@ public class MMOBuffsExpansion extends PlaceholderExpansion {
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player != null && player.isOnline()) {
             EffectHolder holder = EffectHolder.get(player.getPlayer());
-            if (params.startsWith("has_")) {
-                return String.valueOf(holder.hasEffect(NamespacedKey.fromString(params.replace("has_", "").toLowerCase(Locale.ROOT), plugin)));
-            }
-            else if (params.startsWith("duration_")) {
-                NamespacedKey key = NamespacedKey.fromString(params.replace("duration_", "").toLowerCase(Locale.ROOT), plugin);
-                if (holder.hasEffect(key))
-                    return PlainTextComponentSerializer.plainText().serialize(holder.getEffect(key).getDurationDisplay().display());
-                else
-                    return "0";
+
+            String[] split = params.split("_", 2);
+
+            if (split.length == 2) {
+                String option = split[0].toLowerCase(Locale.ROOT);
+                NamespacedKey key = NamespacedKey.fromString(split[1].toLowerCase(Locale.ROOT), plugin);
+
+                switch (option) {
+                    case "has" -> {
+                        return String.valueOf(holder.hasEffect(key));
+                    }
+
+                    case "duration" -> {
+                        if (holder.hasEffect(key))
+                            return PlainTextComponentSerializer.plainText().serialize(holder.getEffect(key).getDurationDisplay().display());
+                        else
+                            return "0";
+                    }
+
+                    case "seconds" -> {
+                        if (holder.hasEffect(key))
+                            return holder.getEffect(key).getDuration() + "";
+                        else
+                            return "0";
+                    }
+
+                    case "stacks" -> {
+                        if (holder.hasEffect(key))
+                            return String.valueOf(holder.getEffect(key).getStacks());
+                        else
+                            return "0";
+                    }
+
+                    case "maxstacks" -> {
+                        if (holder.hasEffect(key))
+                            return String.valueOf(holder.getEffect(key).getStatusEffect().getMaxStacks());
+                        else
+                            return "0";
+                    }
+
+                    default -> {
+                        String[] optionParams = split[1].split("_", 2);
+                        if (optionParams.length == 2) {
+                            key = NamespacedKey.fromString(optionParams[1].toLowerCase(Locale.ROOT), plugin);
+                            switch (option) {
+                                case "value" -> {
+                                    if (key != null && holder.hasEffect(key))
+                                        return String.valueOf(holder.getEffect(key).getStatValue(optionParams[0]));
+                                    else
+                                        return "0";
+                                }
+                                case "basevalue" -> {
+                                    if (key != null && holder.hasEffect(key))
+                                        return String.valueOf(holder.getEffect(key).getStatusEffect().getStats().get(optionParams[0]));
+                                    else
+                                        return "0";
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         return null;

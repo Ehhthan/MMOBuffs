@@ -16,7 +16,6 @@ import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import com.ehhthan.mmobuffs.api.effect.StatusEffect;
 import com.ehhthan.mmobuffs.api.modifier.Modifier;
 import com.ehhthan.mmobuffs.manager.type.LanguageManager;
-import io.lumine.mythic.utils.numbers.RangedInt;
 import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
@@ -67,22 +66,18 @@ public class MMOBuffsCommand extends BaseCommand {
 
     @Subcommand("clear|remove")
     @CommandPermission("mmobuffs.clear")
-    @Description("Clear a status effect from a player.")
+    @Description("Clear status effects from a player.")
     @CommandCompletion("@players @effects|all|permanent")
     @Syntax("<player> <effect|all|permanent>")
     public void onClearCommand(CommandSender sender, EffectHolder holder, String choice) {
         if (choice.equalsIgnoreCase("all"))
-            for (NamespacedKey key : holder.getEffects(false)) {
-                holder.removeEffect(key);
-            }
+            holder.removeAllEffects(false);
         else if (choice.equalsIgnoreCase("permanent"))
-            for (NamespacedKey key : holder.getEffects(true)) {
-                holder.removeEffect(key);
-            }
+            holder.removeAllEffects(true);
         else if (holder.hasEffect(NamespacedKey.fromString(choice, plugin)))
             holder.removeEffect(NamespacedKey.fromString(choice, plugin));
         else
-            throw new InvalidCommandArgument("Invalid effect specified.");
+            throw new InvalidCommandArgument("Invalid effect option specified.");
     }
 
     @Subcommand("time|duration")

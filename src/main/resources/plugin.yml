@@ -2,7 +2,8 @@ name: MMOBuffs
 version: '${project.version}'
 main: com.ehhthan.mmobuffs.MMOBuffs
 api-version: 1.16
-soft-depend: [ MythicLib, PlaceholderAPI ]
+soft-depend: [MythicLib]
+depend: [PlaceholderAPI]
 authors: [ Ehhthan ]
 commands:
   mmobuffs:

@@ -3,7 +3,6 @@ package com.ehhthan.mmobuffs.api.effect.display.duration;
 import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
@@ -53,7 +52,7 @@ public class TimedDisplay implements DurationDisplay {
         return component;
     };
 
-    private static final Function<Duration, Component> DISPLAY_FORMAT = (duration) -> {
+    private static final Function<Duration, Component> LONG_DISPLAY_FORMAT = (duration) -> {
         List<Component> components = new LinkedList<>();
 
         components.add(DAYS_FORMAT.apply(duration.toDaysPart()));
@@ -75,6 +74,19 @@ public class TimedDisplay implements DurationDisplay {
         return builder.build();
     };
 
+    private static final Function<Duration, Component> SHORT_DISPLAY_FORMAT = (duration) -> {
+        if (duration.toDaysPart() > 0)
+            return DAYS_FORMAT.apply(duration.toDaysPart());
+        else if (duration.toHoursPart() > 0)
+            return HOURS_FORMAT.apply(duration.toHoursPart());
+        else if (duration.toMinutesPart() > 0)
+            return MINUTES_FORMAT.apply(duration.toMinutesPart());
+        else if (duration.toSecondsPart() > 0)
+            return SECONDS_FORMAT.apply(duration.toSecondsPart());
+        else
+            return Component.empty();
+    };
+
     private final ActiveStatusEffect effect;
 
     public TimedDisplay(ActiveStatusEffect effect) {
@@ -83,6 +95,9 @@ public class TimedDisplay implements DurationDisplay {
 
     @Override
     public Component display() {
-        return DISPLAY_FORMAT.apply(Duration.ofSeconds(effect.getDuration()));
+        Duration duration = Duration.ofSeconds(effect.getDuration());
+        return (MMOBuffs.getInst().getConfig().getBoolean("shorten-duration-display", true))
+            ? SHORT_DISPLAY_FORMAT.apply(duration)
+            : LONG_DISPLAY_FORMAT.apply(duration);
     }
 }

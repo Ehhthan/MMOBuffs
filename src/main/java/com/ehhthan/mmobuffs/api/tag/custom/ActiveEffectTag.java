@@ -9,7 +9,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
-import static com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect.EffectBuilder;
+import static com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect.ActiveEffectBuilder;
 import static com.ehhthan.mmobuffs.api.tag.CustomTagTypes.BOOLEAN;
 import static com.ehhthan.mmobuffs.api.tag.CustomTagTypes.NAMESPACED_KEY;
 import static com.ehhthan.mmobuffs.util.KeyUtil.key;
@@ -38,7 +38,7 @@ public class ActiveEffectTag implements PersistentDataType<PersistentDataContain
     public @NotNull PersistentDataContainer toPrimitive(@NotNull ActiveStatusEffect effect, @NotNull PersistentDataAdapterContext context) {
         PersistentDataContainer container = context.newPersistentDataContainer();
 
-        container.set(EFFECT, NAMESPACED_KEY, effect.getEffect().getKey());
+        container.set(EFFECT, NAMESPACED_KEY, effect.getStatusEffect().getKey());
         container.set(START_DURATION, INTEGER, effect.getStartDuration());
         container.set(START_STACKS, INTEGER, effect.getStartStacks());
 
@@ -48,7 +48,6 @@ public class ActiveEffectTag implements PersistentDataType<PersistentDataContain
             container.set(DURATION, INTEGER, effect.getDuration());
 
         container.set(STACKS, INTEGER, effect.getStacks());
-        container.set(DISPLAY, BOOLEAN, effect.isDisplayable());
 
         return container;
     }
@@ -57,10 +56,9 @@ public class ActiveEffectTag implements PersistentDataType<PersistentDataContain
     public @NotNull ActiveStatusEffect fromPrimitive(@NotNull PersistentDataContainer container, @NotNull PersistentDataAdapterContext context) {
         StatusEffect effect = MMOBuffs.getInst().getEffectManager().get(container.get(EFFECT, NAMESPACED_KEY));
 
-        EffectBuilder builder = ActiveStatusEffect.builder(effect)
+        ActiveEffectBuilder builder = ActiveStatusEffect.builder(effect)
             .startDuration(container.getOrDefault(START_DURATION, INTEGER, 0))
             .startStacks(container.getOrDefault(START_STACKS, INTEGER, 0))
-            .displayable(container.getOrDefault(DISPLAY, BOOLEAN, true))
             .permanent(container.getOrDefault(PERMANENT, BOOLEAN, false))
             .duration(container.getOrDefault(DURATION, INTEGER, 0))
             .stacks(container.getOrDefault(STACKS, INTEGER, 0));

@@ -2,6 +2,7 @@ package com.ehhthan.mmobuffs.api.effect.display;
 
 import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -9,6 +10,7 @@ import net.kyori.adventure.text.minimessage.Template;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,16 +34,19 @@ public class EffectDisplay {
         return text;
     }
 
-    // TODO: 10/20/2021 add value ph
-    public Component build(@NotNull ActiveStatusEffect effect) {
-        if (!effect.isDisplayable())
-            return Component.empty();
-
+    public Component build(Player player, @NotNull ActiveStatusEffect effect) {
         List<Template> templates = new ArrayList<>();
         templates.add(Template.of("icon", StringEscapeUtils.unescapeJava(icon)));
         templates.add(Template.of("duration", effect.getDurationDisplay().display()));
+        templates.add(Template.of("stacks", effect.getStacks() + ""));
+        templates.add(Template.of("max-stacks", effect.getStatusEffect().getMaxStacks() + ""));
+        templates.add(Template.of("start-duration", effect.getStartDuration() + ""));
 
-        Component parsed = MiniMessage.get().parse(StringEscapeUtils.unescapeJava(text), templates);
+        for (String key : effect.getStatusEffect().getStats().keySet()) {
+            templates.add(Template.of("stat:" + key, effect.getStatValue(key) + ""));
+        }
+
+        Component parsed = MiniMessage.get().parse(PlaceholderAPI.setPlaceholders(player, StringEscapeUtils.unescapeJava(text)), templates);
 
         FileConfiguration config = MMOBuffs.getInst().getConfig();
         if (config.getBoolean("resource-pack.enabled")) {
