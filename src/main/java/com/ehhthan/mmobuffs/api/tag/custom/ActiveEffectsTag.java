@@ -35,7 +35,12 @@ public class ActiveEffectsTag implements PersistentDataType<PersistentDataContai
         ActiveStatusEffect[] complex = new ActiveStatusEffect[primitive.length];
 
         for (int i = 0; i < primitive.length; i++) {
-            complex[i] = CustomTagTypes.ACTIVE_EFFECT.fromPrimitive(primitive[i], context);
+            try {
+                complex[i] = CustomTagTypes.ACTIVE_EFFECT.fromPrimitive(primitive[i], context);
+            } catch (IllegalArgumentException e) {
+                complex[i] = null;
+            }
+
         }
 
         return complex;

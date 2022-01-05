@@ -2,7 +2,6 @@ package com.ehhthan.mmobuffs.api.effect.display;
 
 import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -14,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class EffectDisplay {
@@ -35,18 +33,10 @@ public class EffectDisplay {
     }
 
     public Component build(Player player, @NotNull ActiveStatusEffect effect) {
-        List<Template> templates = new ArrayList<>();
+        List<Template> templates = effect.getTemplates();
         templates.add(Template.of("icon", StringEscapeUtils.unescapeJava(icon)));
-        templates.add(Template.of("duration", effect.getDurationDisplay().display()));
-        templates.add(Template.of("stacks", effect.getStacks() + ""));
-        templates.add(Template.of("max-stacks", effect.getStatusEffect().getMaxStacks() + ""));
-        templates.add(Template.of("start-duration", effect.getStartDuration() + ""));
 
-        for (String key : effect.getStatusEffect().getStats().keySet()) {
-            templates.add(Template.of("stat:" + key, effect.getStatValue(key) + ""));
-        }
-
-        Component parsed = MiniMessage.get().parse(PlaceholderAPI.setPlaceholders(player, StringEscapeUtils.unescapeJava(text)), templates);
+        Component parsed = MiniMessage.get().parse(MMOBuffs.getInst().getParserManager().parse(player, StringEscapeUtils.unescapeJava(text)), templates);
 
         FileConfiguration config = MMOBuffs.getInst().getConfig();
         if (config.getBoolean("resource-pack.enabled")) {

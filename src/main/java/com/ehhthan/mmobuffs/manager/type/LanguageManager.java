@@ -8,6 +8,8 @@ import net.kyori.adventure.text.minimessage.Template;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+
 public final class LanguageManager implements Reloadable {
     private ConfigFile language;
 
@@ -31,6 +33,11 @@ public final class LanguageManager implements Reloadable {
     @Nullable
     public Component getMessage(@NotNull String path) {
         return getMessage(path, true);
+    }
+
+    @Nullable
+    public Component getMessage(@NotNull String path, boolean hasPrefix, Collection<Template> templates) {
+        return getMessage(path, hasPrefix, templates.toArray(Template[]::new));
     }
 
     @Nullable

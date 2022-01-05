@@ -1,9 +1,22 @@
+# MMOBUFFS MESSAGES
+#
+# If you wish for a message to not be sent, set it to [].
+#
 # GLOBAL
 prefix: '<#3c4345>[<#53d46c>MMOBuffs<#3c4345>] '
 
 # COMMANDS
 unknown-command: '<red>Unknown command.'
 player-not-found: '<red>Player was not found.'
+
+give-effect: '<green>Gave <player> a <name> Effect for <duration>.'
+give-effect-permanent: '<green>Gave <player> a permanent <name> Effect.'
+
+clear-effect: '<green>Removed <name> Effect from <player>.'
+clear-all-effects: '<green>Removed all timed effects from <player>.'
+clear-permanent-effects: '<green>Removed all effects from <player>.'
+
+time-effect: '<green>Updated the duration of the <name> Effect on <player>.'
 
 reload-command: '<green>Successfully reloaded MMOBuffs.'
 
@@ -18,4 +31,8 @@ duration-display:
   separator: ' '
 
   permanent: 'Permanent'
+
+list-display:
+  header: '<#207d33>⭐-------- <#53d46c><bold>ACTIVE EFFECTS</bold> <#207d33>--------⭐'
+  effect-element: '<#53d46c><name> <#767d87>: <duration>'
 

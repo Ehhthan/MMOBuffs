@@ -49,7 +49,7 @@ public abstract class KeyedManager<T> extends Manager<T> {
     }
 
     public T get(NamespacedKey key) {
-        Preconditions.checkArgument(has(key), "Effect does not exist.");
+        Preconditions.checkArgument(managed.containsKey(key), key.asString() + " does not exist.");
         return managed.get(key);
     }
 }

@@ -3,19 +3,27 @@ package com.ehhthan.mmobuffs.api.effect;
 import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.effect.display.EffectDisplay;
 import com.ehhthan.mmobuffs.api.effect.stack.StackType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.Template;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class StatusEffect implements Keyed {
+public class StatusEffect implements Keyed, TemplateHolder {
     private final NamespacedKey key;
+    private final Component name;
+
     private final Map<String, Double> stats;
 
     private final int maxStacks;
@@ -26,6 +34,7 @@ public class StatusEffect implements Keyed {
     @SuppressWarnings("ConstantConditions")
     public StatusEffect(@NotNull ConfigurationSection section) {
         this.key = NamespacedKey.fromString(section.getName().toLowerCase(Locale.ROOT), MMOBuffs.getInst());
+        this.name = MiniMessage.get().parse(section.getString("display-name", WordUtils.capitalize(key.getKey())));
 
         if (section.isConfigurationSection("stats")) {
             this.stats = new LinkedHashMap<>();
@@ -52,6 +61,10 @@ public class StatusEffect implements Keyed {
         return key;
     }
 
+    public Component getName() {
+        return name;
+    }
+
     public boolean hasStats() {
         return stats != null && !stats.isEmpty();
     }
@@ -74,5 +87,16 @@ public class StatusEffect implements Keyed {
 
     public @Nullable EffectDisplay getDisplay() {
         return display;
+    }
+
+    @Override
+    public Collection<Template> getTemplates() {
+        List<Template> templates = new ArrayList<>();
+
+        templates.add(Template.of("max-stacks", getMaxStacks() + ""));
+        templates.add(Template.of("name", name));
+        templates.add(Template.of("stack-type", WordUtils.capitalize(stackType.name().toLowerCase(Locale.ROOT))));
+
+        return templates;
     }
 }

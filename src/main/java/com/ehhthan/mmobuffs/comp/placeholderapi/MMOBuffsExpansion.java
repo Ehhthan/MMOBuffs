@@ -45,6 +45,12 @@ public class MMOBuffsExpansion extends PlaceholderExpansion {
                 NamespacedKey key = NamespacedKey.fromString(split[1].toLowerCase(Locale.ROOT), plugin);
 
                 switch (option) {
+                    case "name" -> {
+                        if (MMOBuffs.getInst().getEffectManager().has(key))
+                            return PlainTextComponentSerializer.plainText().serialize(MMOBuffs.getInst().getEffectManager().get(key).getName());
+                        else
+                            return "";
+                    }
                     case "has" -> {
                         return String.valueOf(holder.hasEffect(key));
                     }

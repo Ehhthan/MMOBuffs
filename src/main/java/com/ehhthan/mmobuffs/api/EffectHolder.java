@@ -9,6 +9,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,34 +27,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 
 import static com.ehhthan.mmobuffs.util.KeyUtil.key;
 
 public class EffectHolder implements PersistentDataHolder {
     private static final NamespacedKey EFFECTS = key("effects");
 
+    private static final Function<ConfigurationSection, BossBar> barSupplier = (section) -> {
+        BossBar.Color color = BossBar.Color.NAMES.value(section.getString("color", "white").toLowerCase(Locale.ROOT));
+        if (color == null)
+            color = BossBar.Color.WHITE;
+
+        BossBar.Overlay overlay = BossBar.Overlay.NAMES.value(section.getString("overlay", "progress").toLowerCase(Locale.ROOT));
+        if (overlay == null)
+            overlay = BossBar.Overlay.PROGRESS;
+
+        return BossBar.bossBar(Component.empty(), section.getInt("value", 1), color, overlay);
+    };
+
     private static final Map<Player, EffectHolder> DATA = new HashMap<>();
 
     private final Map<NamespacedKey, ActiveStatusEffect> effects = new HashMap<>();
 
+
     private final Player player;
-    private final BossBar bossBar;
+    private BossBar bossBar;
 
     @SuppressWarnings("ConstantConditions")
     public EffectHolder(@NotNull Player player) {
         this.player = player;
-
         FileConfiguration config = MMOBuffs.getInst().getConfig();
-        this.bossBar = BossBar.bossBar(Component.empty()
-            , config.getInt("bossbar-display.value", 1)
-            , BossBar.Color.NAMES.value(config.getString("bossbar-display.color", "white").toLowerCase(Locale.ROOT))
-            , BossBar.Overlay.NAMES.value(config.getString("bossbar-display.overlay", "progress").toLowerCase(Locale.ROOT)));
+
+        if (config.isConfigurationSection("bossbar-display") && config.getBoolean("bossbar-display.enabled", true))
+            this.bossBar = barSupplier.apply(config.getConfigurationSection("bossbar-display"));
 
         if (getPersistentDataContainer().has(EFFECTS, CustomTagTypes.ACTIVE_EFFECTS)) {
             ActiveStatusEffect[] savedEffects = getPersistentDataContainer().get(EFFECTS, CustomTagTypes.ACTIVE_EFFECTS);
             if (savedEffects != null && savedEffects.length > 0)
                 for (ActiveStatusEffect effect : savedEffects) {
-                    addEffect(Modifier.REPLACE, effect);
+                    if (effect != null)
+                        addEffect(Modifier.REPLACE, effect);
                 }
         }
 
@@ -81,25 +95,28 @@ public class EffectHolder implements PersistentDataHolder {
                     save();
                 }
 
-                if (config.getBoolean("bossbar-display.enabled", true) && display) {
-                    TextComponent.Builder builder = Component.text();
+                if (bossBar != null) {
+                    if (display) {
+                        TextComponent.Builder builder = Component.text();
 
-                    List<ActiveStatusEffect> sortedEffects = effects.values().stream().sorted(Comparator.comparingInt(ActiveStatusEffect::getDuration)).toList();
-                    for (int i = 0; i < sortedEffects.size(); i++) {
-                        ActiveStatusEffect effect = sortedEffects.get(i);
-                        if (effect.getStatusEffect().hasDisplay()) {
-                            builder.append(effect.getStatusEffect().getDisplay().build(player, effect));
+                        List<ActiveStatusEffect> sortedEffects = effects.values().stream().sorted(Comparator.comparingInt(ActiveStatusEffect::getDuration)).toList();
+                        for (int i = 0; i < sortedEffects.size(); i++) {
+                            ActiveStatusEffect effect = sortedEffects.get(i);
+                            if (effect.getStatusEffect().hasDisplay()) {
+                                builder.append(effect.getStatusEffect().getDisplay().build(player, effect));
 
-                            if (i != sortedEffects.size() - 1) {
-                                builder.append(Component.text(config.getString("bossbar-display.effect-separator", " ")));
+                                if (i != sortedEffects.size() - 1) {
+                                    builder.append(Component.text(config.getString("bossbar-display.effect-separator", " ")));
+                                }
                             }
                         }
+
+                        bossBar.name(builder.build());
+                        player.showBossBar(bossBar);
+                    } else {
+                        player.hideBossBar(bossBar);
                     }
 
-                    bossBar.name(builder.build());
-                    player.showBossBar(bossBar);
-                } else {
-                    player.hideBossBar(bossBar);
                 }
             }
         }.runTaskTimer(MMOBuffs.getInst(), 1, 20);
@@ -116,7 +133,7 @@ public class EffectHolder implements PersistentDataHolder {
 
     public void updateEffect(NamespacedKey key) {
         ActiveStatusEffect activeEffect = getEffect(key);
-        if (activeEffect.getStatusEffect().hasStats()) {
+        if (MMOBuffs.getInst().hasStatHandler() && activeEffect.getStatusEffect().hasStats()) {
             MMOBuffs.getInst().getStatHandler().edit(EffectHolder.this, StatHandler.EditType.ADD, activeEffect);
         }
     }
@@ -129,13 +146,13 @@ public class EffectHolder implements PersistentDataHolder {
         } else {
             effects.put(key, effect);
         }
-        if (effect.getStatusEffect().hasStats())
+        if (MMOBuffs.getInst().hasStatHandler() && effect.getStatusEffect().hasStats())
             MMOBuffs.getInst().getStatHandler().edit(this, StatHandler.EditType.ADD, effect);
     }
 
     public void removeEffect(NamespacedKey key) {
         ActiveStatusEffect activeEffect = getEffect(key);
-        if (activeEffect.getStatusEffect().hasStats())
+        if (MMOBuffs.getInst().hasStatHandler() && activeEffect.getStatusEffect().hasStats())
             MMOBuffs.getInst().getStatHandler().edit(this, StatHandler.EditType.REMOVE, activeEffect);
         effects.remove(key);
     }

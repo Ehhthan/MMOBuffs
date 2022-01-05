@@ -1,10 +1,11 @@
 strong:
+  display-name: '<red>Strong'
   max-stacks: 4
   stack-type: normal
   stats:
     defense: 10
     armor: 1
-    max-health: 2
+    max_health: 2
   display:
     icon: \uE001
     text: "<icon> <duration>"

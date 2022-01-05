@@ -6,8 +6,12 @@ import com.ehhthan.mmobuffs.api.effect.display.duration.TimedDisplay;
 import com.ehhthan.mmobuffs.api.effect.stack.StackType;
 import com.ehhthan.mmobuffs.api.modifier.Modifier;
 import com.google.common.base.Preconditions;
+import net.kyori.adventure.text.minimessage.Template;
 
-public class ActiveStatusEffect {
+import java.util.ArrayList;
+import java.util.List;
+
+public class ActiveStatusEffect implements TemplateHolder {
     private final StatusEffect statusEffect;
     private final int startDuration;
     private final int startStacks;
@@ -64,7 +68,10 @@ public class ActiveStatusEffect {
     }
 
     public double getStatValue(String key) {
-        return MMOBuffs.getInst().getStatHandler().getValue(this, key);
+        if (MMOBuffs.getInst().hasStatHandler())
+            return MMOBuffs.getInst().getStatHandler().getValue(this, key);
+        else
+            return 0;
     }
 
     public boolean tick() {
@@ -111,6 +118,24 @@ public class ActiveStatusEffect {
 
     public void setStacks(int stacks) {
         this.stacks = Math.max(0, Math.min(stacks, statusEffect.getMaxStacks()));
+    }
+
+    @Override
+    public List<Template> getTemplates() {
+        List<Template> templates = new ArrayList<>();
+        templates.add(Template.of("seconds", getDuration() + ""));
+        templates.add(Template.of("duration", getDurationDisplay().display()));
+        templates.add(Template.of("stacks", getStacks() + ""));
+        templates.add(Template.of("start-duration", getStartDuration() + ""));
+        templates.add(Template.of("start-stacks", getStartStacks() + ""));
+
+        for (String key : getStatusEffect().getStats().keySet()) {
+            templates.add(Template.of("stat:" + key, getStatValue(key) + ""));
+        }
+
+        templates.addAll(getStatusEffect().getTemplates());
+
+        return templates;
     }
 
     public ActiveStatusEffect merge(Modifier modifier, ActiveStatusEffect latest) {
