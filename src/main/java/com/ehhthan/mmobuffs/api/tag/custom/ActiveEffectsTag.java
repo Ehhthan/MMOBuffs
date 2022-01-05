@@ -18,8 +18,9 @@ public class ActiveEffectsTag implements PersistentDataType<PersistentDataContai
         return ActiveStatusEffect[].class;
     }
 
+    @NotNull
     @Override
-    public PersistentDataContainer @NotNull [] toPrimitive(ActiveStatusEffect @NotNull [] complex, @NotNull PersistentDataAdapterContext context) {
+    public PersistentDataContainer[] toPrimitive(ActiveStatusEffect[] complex, @NotNull PersistentDataAdapterContext context) {
         PersistentDataContainer[] primitive = new PersistentDataContainer[complex.length];
 
         for (int i = 0; i < complex.length; i++) {
@@ -30,8 +31,9 @@ public class ActiveEffectsTag implements PersistentDataType<PersistentDataContai
         return primitive;
     }
 
+    @NotNull
     @Override
-    public ActiveStatusEffect @NotNull [] fromPrimitive(PersistentDataContainer @NotNull [] primitive, @NotNull PersistentDataAdapterContext context) {
+    public ActiveStatusEffect[] fromPrimitive(PersistentDataContainer[] primitive, @NotNull PersistentDataAdapterContext context) {
         ActiveStatusEffect[] complex = new ActiveStatusEffect[primitive.length];
 
         for (int i = 0; i < primitive.length; i++) {

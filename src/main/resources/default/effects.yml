@@ -7,5 +7,14 @@ strong:
     armor: 1
     max_health: 2
   display:
-    icon: \uE001
+    icon: \uE040
     text: "<icon> <duration>"
+damage:
+  display-name: '<red>Damage'
+  max-stacks: 4
+  stack-type: normal
+  stats:
+    attack_damage: 3
+  display:
+    icon: \uE021
+    text: "<icon> <red><duration>"

@@ -15,6 +15,7 @@ import com.ehhthan.mmobuffs.manager.type.ConfigManager;
 import com.ehhthan.mmobuffs.manager.type.EffectManager;
 import com.ehhthan.mmobuffs.manager.type.LanguageManager;
 import com.ehhthan.mmobuffs.manager.type.ParserManager;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -61,7 +62,7 @@ public final class MMOBuffs extends JavaPlugin {
         }
 
         if (Bukkit.getPluginManager().getPlugin("MythicLib") != null) {
-            this.statHandler = new MythicLibStatHandler();
+            setStatHandler(new MythicLibStatHandler());
             getLogger().log(Level.INFO, "MythicLib support detected.");
         }
 
@@ -70,6 +71,8 @@ public final class MMOBuffs extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new CombatListener(), this);
 
         registerCommands();
+
+        new Metrics(this, 13855);
 
         if (!hasStatHandler()) {
             getLogger().log(Level.WARNING, "No stat handler plugin has been registered.");
@@ -140,5 +143,9 @@ public final class MMOBuffs extends JavaPlugin {
 
     public StatHandler<?> getStatHandler() {
         return statHandler;
+    }
+
+    public void setStatHandler(StatHandler<?> statHandler) {
+        this.statHandler = statHandler;
     }
 }

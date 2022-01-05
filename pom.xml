@@ -6,7 +6,7 @@
 
     <groupId>MMOBuffs</groupId>
     <artifactId>MMOBuffs</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>MMOBuffs</name>
@@ -40,6 +40,10 @@
                         <relocation>
                             <pattern>co.aikar.locales</pattern>
                             <shadedPattern>com.ehhthan.mmobuffs.locales</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.bstats</pattern>
+                            <shadedPattern>com.ehhthan.mmobuffs.metrics</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -103,12 +107,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>net.Indyuce</groupId>
-            <artifactId>MMOItems</artifactId>
-            <version>6.6.2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>io.lumine</groupId>
             <artifactId>MythicLib</artifactId>
             <version>1.0.19</version>
@@ -130,6 +128,12 @@
             <artifactId>placeholderapi</artifactId>
             <version>2.11.1</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>2.2.1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
