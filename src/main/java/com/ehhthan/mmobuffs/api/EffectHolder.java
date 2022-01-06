@@ -99,6 +99,7 @@ public class EffectHolder implements PersistentDataHolder {
                     if (display) {
                         TextComponent.Builder builder = Component.text();
 
+                        // TODO: 1/6/2022 Sorting option in config
                         List<ActiveStatusEffect> sortedEffects = effects.values().stream().sorted(Comparator.comparingInt(ActiveStatusEffect::getDuration)).toList();
                         for (int i = 0; i < sortedEffects.size(); i++) {
                             ActiveStatusEffect effect = sortedEffects.get(i);

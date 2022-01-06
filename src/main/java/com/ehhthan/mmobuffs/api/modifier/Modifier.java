@@ -1,5 +1,6 @@
 package com.ehhthan.mmobuffs.api.modifier;
 
+// TODO: 1/6/2022 generalize so can be used with stacks
 public enum Modifier {
     /**
      * Overwrites the existing effect under the same name with the one specified.

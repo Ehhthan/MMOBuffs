@@ -30,6 +30,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+// TODO: 1/6/2022 Test if permission mmobuffs.* works and implement if it doesn't
+
 @CommandAlias("mmobuffs|mmobuff|buffs|buff")
 @Description("Main mmobars command.")
 public class MMOBuffsCommand extends BaseCommand {
@@ -149,6 +151,8 @@ public class MMOBuffsCommand extends BaseCommand {
         if (message != null)
             sender.sendMessage(message);
     }
+
+    // TODO: 1/6/2022 Add stack command that functions like time command.
 
     @Subcommand("list")
     @CommandPermission("mmobuffs.list")
