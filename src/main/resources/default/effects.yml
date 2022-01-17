@@ -1,5 +1,5 @@
 strong:
-  display-name: '<red>Strong'
+  display-name: '<yellow>Strong'
   max-stacks: 4
   stack-type: normal
   stats:

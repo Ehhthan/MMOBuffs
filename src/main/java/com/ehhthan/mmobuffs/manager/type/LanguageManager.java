@@ -1,5 +1,6 @@
 package com.ehhthan.mmobuffs.manager.type;
 
+import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.manager.ConfigFile;
 import com.ehhthan.mmobuffs.manager.Reloadable;
 import net.kyori.adventure.text.Component;
@@ -9,9 +10,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class LanguageManager implements Reloadable {
     private ConfigFile language;
+
+    private boolean hasWarned = false;
 
     public LanguageManager() {
         reload();
@@ -48,7 +53,18 @@ public final class LanguageManager implements Reloadable {
         if (found != null && (found.isEmpty() || found.equals("[]")))
             return null;
 
-        String input = found == null ? "<MNF:" + path + ">" : prefix + found;
+        String input;
+        if (found == null) {
+            if (!hasWarned) {
+                Logger logger = MMOBuffs.getInst().getLogger();
+                logger.log(Level.WARNING, "Message Missing: " + path);
+                logger.log(Level.WARNING, "You should either add this field yourself to your language.yml or refresh it.");
+                hasWarned = true;
+            }
+            input = "<Message-Missing:" + path + ">";
+        } else {
+            input = prefix + found;
+        }
 
         if (templates != null && templates.length > 0)
             return MiniMessage.get().parse(input, templates);
