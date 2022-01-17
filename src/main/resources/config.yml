@@ -24,13 +24,6 @@ sorting:
   # If true the effects with the lowest duration left will be displayed first.
   duration-ascending: true
 
-on-death:
-  # If timed effects should be removed on player death.
-  remove-timed-effects: true
-
-  # If permanent effects should be removed on player death.
-  remove-permanent-effects: false
-
 # Whether to use a shortened display.
 shorten-duration-display: true
 
