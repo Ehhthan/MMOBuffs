@@ -22,6 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -98,9 +99,13 @@ public class EffectHolder implements PersistentDataHolder {
                 if (bossBar != null) {
                     if (display) {
                         TextComponent.Builder builder = Component.text();
+                        List<ActiveStatusEffect> sortedEffects = effects.values().stream().sorted().toList();
 
                         // TODO: 1/6/2022 Sorting option in config
-                        List<ActiveStatusEffect> sortedEffects = effects.values().stream().sorted(Comparator.comparingInt(ActiveStatusEffect::getDuration)).toList();
+                        // Checks if the effects should be descending.
+                        if (!MMOBuffs.getInst().getConfig().getBoolean("sorting.duration-ascending", true))
+                            Collections.reverse(sortedEffects);
+
                         for (int i = 0; i < sortedEffects.size(); i++) {
                             ActiveStatusEffect effect = sortedEffects.get(i);
                             if (effect.getStatusEffect().hasDisplay()) {

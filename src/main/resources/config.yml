@@ -19,6 +19,11 @@ bossbar-display:
   # Default percentage value of the bossbar. Value must be between [0,1].
   value: 0
 
+# How effects are sorted when displayed.
+sorting:
+  # If true the effects with the lowest duration left will be displayed first.
+  duration-ascending: true
+
 on-death:
   # If timed effects should be removed on player death.
   remove-timed-effects: true

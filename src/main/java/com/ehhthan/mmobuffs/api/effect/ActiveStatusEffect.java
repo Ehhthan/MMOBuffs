@@ -7,11 +7,12 @@ import com.ehhthan.mmobuffs.api.effect.stack.StackType;
 import com.ehhthan.mmobuffs.api.modifier.Modifier;
 import com.google.common.base.Preconditions;
 import net.kyori.adventure.text.minimessage.Template;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ActiveStatusEffect implements TemplateHolder {
+public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStatusEffect> {
     private final StatusEffect statusEffect;
     private final int startDuration;
     private final int startStacks;
@@ -173,6 +174,11 @@ public class ActiveStatusEffect implements TemplateHolder {
     }
 
     @Override
+    public int compareTo(@NotNull ActiveStatusEffect o) {
+        return Integer.compare(duration, o.duration);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -203,6 +209,7 @@ public class ActiveStatusEffect implements TemplateHolder {
     public static ActiveEffectBuilder builder(StatusEffect statusEffect) {
         return new ActiveEffectBuilder(statusEffect);
     }
+
 
     public static class ActiveEffectBuilder {
         private final StatusEffect effect;
