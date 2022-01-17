@@ -9,7 +9,7 @@ public enum Modifier {
      * will remove the effect and re-apply it with the new settings.)
      * Use this as default if not specified in the command.
      */
-    REPLACE,
+    SET,
 
     /**
      * If the player already has the specified effect, do not modify anything. If the player

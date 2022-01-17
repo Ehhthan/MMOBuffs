@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -68,7 +67,7 @@ public class EffectHolder implements PersistentDataHolder {
             if (savedEffects != null && savedEffects.length > 0)
                 for (ActiveStatusEffect effect : savedEffects) {
                     if (effect != null)
-                        addEffect(Modifier.REPLACE, effect);
+                        addEffect(Modifier.SET, effect);
                 }
         }
 

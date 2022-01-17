@@ -93,7 +93,7 @@ public class MMOBuffsCommand extends BaseCommand {
     @CommandPermission("mmobuffs.clear")
     @Description("Remove a single effect, all non permanent effects, or every effect from a player.")
     @CommandCompletion("@players @effects|all|permanent true|false")
-    @Syntax("<player> <effect|all|permanent> [silent]")
+    @Syntax("<player> <effect|all|permanent>")
     public void onClearCommand(CommandSender sender, EffectHolder holder, String choice) {
         Component message;
         List<Template> templates = new ArrayList<>();

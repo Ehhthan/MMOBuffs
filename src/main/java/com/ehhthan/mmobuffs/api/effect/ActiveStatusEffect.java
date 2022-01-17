@@ -144,7 +144,7 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
             "Effects of two different types cannot be merged: %s + %s", statusEffect.getKey(), latest.statusEffect.getKey());
 
         switch (modifier) {
-            case REPLACE -> {
+            case SET -> {
                 return latest;
             }
 
