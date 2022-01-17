@@ -17,6 +17,7 @@ clear-all-effects: '<green>Removed all timed effects from <player>.'
 clear-permanent-effects: '<green>Removed all effects from <player>.'
 
 time-effect: '<green>Updated the duration of the <name> Effect on <player>.'
+stack-effect: '<green>Updated the stacks of the <name> Effect on <player>.'
 
 reload-command: '<green>Successfully reloaded MMOBuffs.'
 

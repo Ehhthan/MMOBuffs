@@ -83,7 +83,7 @@ public final class MMOBuffs extends JavaPlugin {
         PaperCommandManager commandManager = new PaperCommandManager(this);
 
         commandManager.getCommandCompletions().registerAsyncCompletion("effects",
-            c -> MMOBuffs.getInst().getEffectManager().keys().stream().map(NamespacedKey::getKey).toList());
+            c -> effectManager.keys().stream().map(NamespacedKey::getKey).toList());
 
         commandManager.getCommandContexts().registerContext(StatusEffect.class, c -> {
             String arg = c.getFirstArg();
