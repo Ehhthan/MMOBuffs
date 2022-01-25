@@ -1,8 +1,6 @@
 package com.ehhthan.mmobuffs.listener;
 
-import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.EffectHolder;
-import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import com.ehhthan.mmobuffs.api.effect.option.EffectOption;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,8 +8,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
-
-import java.util.Collection;
 
 public class WorldListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)

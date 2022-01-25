@@ -26,7 +26,7 @@ public class StatusEffect implements Keyed, TemplateHolder {
     private final NamespacedKey key;
     private final Component name;
 
-    private final Map<String, Double> stats;
+    private final Map<String, String> stats;
     private final Map<EffectOption, Boolean> options = new HashMap<>();
 
     private final int maxStacks;
@@ -45,7 +45,7 @@ public class StatusEffect implements Keyed, TemplateHolder {
             ConfigurationSection statSection = section.getConfigurationSection("stats");
             for (String key : statSection.getKeys(false)) {
                 if (statSection.isSet(key))
-                    stats.put(key.toLowerCase(Locale.ROOT), statSection.getDouble(key));
+                    stats.put(key.toLowerCase(Locale.ROOT), statSection.getString(key));
             }
         } else {
             this.stats = null;
@@ -79,7 +79,7 @@ public class StatusEffect implements Keyed, TemplateHolder {
         return stats != null && !stats.isEmpty();
     }
 
-    public Map<String, Double> getStats() {
+    public Map<String, String> getStats() {
         return stats;
     }
 

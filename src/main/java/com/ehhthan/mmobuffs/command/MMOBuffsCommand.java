@@ -30,8 +30,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-// TODO: 1/6/2022 Test if permission mmobuffs.* works and implement if it doesn't
-
 @CommandAlias("mmobuffs|mmobuff|buffs|buff")
 @Description("Main mmobuffs command.")
 public class MMOBuffsCommand extends BaseCommand {
@@ -160,7 +158,7 @@ public class MMOBuffsCommand extends BaseCommand {
     }
 
     // TODO: 1/6/2022 Add stack command that functions like time command.
-    @Subcommand("stack|amount")
+    @Subcommand("stack|stacks")
     @CommandPermission("mmobuffs.stack")
     @Description("Alter the stacks of an effect.")
     @CommandCompletion("@players @effects * @range:1-9")

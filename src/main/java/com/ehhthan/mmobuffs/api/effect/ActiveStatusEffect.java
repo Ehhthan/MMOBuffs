@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStatusEffect> {
     private final StatusEffect statusEffect;
@@ -68,13 +69,6 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
         return active;
     }
 
-    public double getStatValue(String key) {
-        if (MMOBuffs.getInst().hasStatHandler())
-            return MMOBuffs.getInst().getStatHandler().getValue(this, key);
-        else
-            return 0;
-    }
-
     public boolean tick() {
         if (!permanent && active) {
             this.duration--;
@@ -130,8 +124,10 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
         templates.add(Template.of("start-duration", getStartDuration() + ""));
         templates.add(Template.of("start-stacks", getStartStacks() + ""));
 
-        for (String key : getStatusEffect().getStats().keySet()) {
-            templates.add(Template.of("stat:" + key, getStatValue(key) + ""));
+        if (MMOBuffs.getInst().hasStatHandler()) {
+            for (Map.Entry<String, String> entry : getStatusEffect().getStats().entrySet()) {
+                templates.add(Template.of("stat:" + entry.getKey(), entry.getValue() + ""));
+            }
         }
 
         templates.addAll(getStatusEffect().getTemplates());
@@ -142,7 +138,10 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
     public ActiveStatusEffect merge(Modifier modifier, ActiveStatusEffect latest) {
         Preconditions.checkArgument(statusEffect.getKey() == latest.statusEffect.getKey(),
             "Effects of two different types cannot be merged: %s + %s", statusEffect.getKey(), latest.statusEffect.getKey());
+        return mergeDuration(modifier, latest);
+    }
 
+    private ActiveStatusEffect mergeDuration(Modifier modifier, ActiveStatusEffect latest) {
         switch (modifier) {
             case SET -> {
                 return latest;
@@ -173,9 +172,13 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
         }
     }
 
+
     @Override
     public int compareTo(@NotNull ActiveStatusEffect o) {
-        return Integer.compare(duration, o.duration);
+        if (isPermanent()) {
+            return (o.isPermanent()) ? 0 : 1;
+        } else
+            return Integer.compare(duration, o.duration);
     }
 
     @Override
@@ -209,7 +212,6 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
     public static ActiveEffectBuilder builder(StatusEffect statusEffect) {
         return new ActiveEffectBuilder(statusEffect);
     }
-
 
     public static class ActiveEffectBuilder {
         private final StatusEffect effect;

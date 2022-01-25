@@ -90,13 +90,13 @@ public class MMOBuffsExpansion extends PlaceholderExpansion {
                             switch (option) {
                                 case "value" -> {
                                     if (key != null && holder.hasEffect(key))
-                                        return String.valueOf(holder.getEffect(key).getStatValue(optionParams[0]));
+                                        return MMOBuffs.getInst().getStatHandler().getValue(holder, key.getKey() + ':' + optionParams[0]);
                                     else
                                         return "0";
                                 }
                                 case "basevalue" -> {
                                     if (key != null && holder.hasEffect(key))
-                                        return String.valueOf(holder.getEffect(key).getStatusEffect().getStats().get(optionParams[0]));
+                                        return holder.getEffect(key).getStatusEffect().getStats().get(optionParams[0]);
                                     else
                                         return "0";
                                 }

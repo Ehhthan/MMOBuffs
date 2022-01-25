@@ -8,7 +8,7 @@ public interface StatHandler<T> {
 
     T adapt(EffectHolder holder);
 
-    double getValue(ActiveStatusEffect effect, String key);
+    String getValue(EffectHolder holder, String key);
 
     enum EditType {
         ADD,
