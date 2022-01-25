@@ -57,7 +57,7 @@ public class MMOBuffsCommand extends BaseCommand {
     @Description("Give an effect to a player.")
     @CommandCompletion("@players @effects @range:1-9 * @range:1-9 true|false")
     @Syntax("<player> <effect> <duration> [modifier] [stacks]")
-    public void onGiveCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, Integer duration, @Default("REPLACE") Modifier modifier,
+    public void onGiveCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, Integer duration, @Default("SET") Modifier modifier,
                               @Default("1") Integer stacks) {
         ActiveStatusEffect activeEffect = ActiveStatusEffect.builder(effect).startDuration(duration).startStacks(stacks).build();
         holder.addEffect(modifier, activeEffect);
