@@ -1,10 +1,10 @@
 # Table of contents
 
-* [Welcome!](README.md)
-* [Quick Start](quick-start.md)
+* [Home](README.md)
 
-## Reference
+## Features
 
-* [API Reference](reference/api-reference/README.md)
-  * [Pets](reference/api-reference/pets.md)
-  * [Users](reference/api-reference/users.md)
+* [Placeholders](features/placeholders.md)
+* [Commands](features/commands.md)
+* [Modifiers](features/modifiers.md)
+* [Stack Types](features/stack-types.md)
