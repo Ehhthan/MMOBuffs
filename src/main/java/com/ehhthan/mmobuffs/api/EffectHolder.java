@@ -50,7 +50,6 @@ public class EffectHolder implements PersistentDataHolder {
 
     private final Map<NamespacedKey, ActiveStatusEffect> effects = new HashMap<>();
 
-
     private final Player player;
     private BossBar bossBar;
 
@@ -78,9 +77,9 @@ public class EffectHolder implements PersistentDataHolder {
                     cancel();
 
                 boolean display = false;
+                Collection<ActiveStatusEffect> values = effects.values();
 
-                if (effects.size() > 0) {
-                    Collection<ActiveStatusEffect> values = effects.values();
+                if (values.size() > 0) {
                     for (ActiveStatusEffect activeEffect : values) {
                         NamespacedKey key = activeEffect.getStatusEffect().getKey();
                         if (activeEffect.tick()) {
@@ -99,7 +98,7 @@ public class EffectHolder implements PersistentDataHolder {
                     if (display) {
                         TextComponent.Builder builder = Component.text();
                         // Creates a list of the displayable active status effects in ascending order.
-                        List<ActiveStatusEffect> sortedEffects = effects.values().stream().filter(e -> e.getStatusEffect().hasDisplay()).sorted().toList();
+                        List<ActiveStatusEffect> sortedEffects = values.stream().filter(e -> e.getStatusEffect().hasDisplay()).sorted().toList();
 
                         // TODO: 1/6/2022 Sorting option in config
                         // Checks if the effects should be descending and reverses if true.

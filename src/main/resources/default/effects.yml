@@ -18,3 +18,14 @@ damage:
   display:
     icon: \uE021
     text: "<icon> <red><duration>"
+speedy:
+  display-name: '<green>Speedy'
+  max-stacks: 1
+  stack-type: normal
+  stats:
+    attack_speed: 50%
+    movement_speed: 10%
+    attack_damage: -30%
+  display:
+    icon: \uE025
+    text: "<icon> <duration>"
