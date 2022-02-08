@@ -2,6 +2,7 @@
 
 * [Home](README.md)
 * [Resource Pack](https://github.com/Ehhthan/MMOBuffs-Wiki/releases/tag/resource-pack)
+* [Issue Tracker](https://github.com/Ehhthan/MMOBuffs-Wiki/issues)
 
 ## Features
 
