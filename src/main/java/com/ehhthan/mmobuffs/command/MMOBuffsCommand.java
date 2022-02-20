@@ -169,13 +169,13 @@ public class MMOBuffsCommand extends BaseCommand {
             int newStacks;
             switch (operation) {
                 case SET -> newStacks = stacks;
-                case ADD -> newStacks = activeEffect.getDuration() + stacks;
-                case SUBTRACT -> newStacks = activeEffect.getDuration() - stacks;
-                case MULTIPLY -> newStacks = activeEffect.getDuration() * stacks;
+                case ADD -> newStacks = activeEffect.getStacks() + stacks;
+                case SUBTRACT -> newStacks = activeEffect.getStacks() - stacks;
+                case MULTIPLY -> newStacks = activeEffect.getStacks() * stacks;
                 case DIVIDE -> {
                     if (stacks == 0)
                         throw new InvalidCommandArgument("Cannot divide by zero.");
-                    newStacks = activeEffect.getDuration() / stacks;
+                    newStacks = activeEffect.getStacks() / stacks;
                 }
                 default -> newStacks = activeEffect.getStacks();
             }
