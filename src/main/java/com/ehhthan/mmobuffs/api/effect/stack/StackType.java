@@ -41,4 +41,6 @@ public enum StackType {
      * onAttack and onHit combined). Removed if duration runs out, and also does not multiply <value>
      */
     COMBAT
+
+    // TODO: 1/6/2022 Concurrent stack type -> stacks time down at all at the same time.
 }

@@ -2,6 +2,7 @@ package com.ehhthan.mmobuffs.api.effect;
 
 import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.effect.display.EffectDisplay;
+import com.ehhthan.mmobuffs.api.effect.option.EffectOption;
 import com.ehhthan.mmobuffs.api.effect.stack.StackType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +26,8 @@ public class StatusEffect implements Keyed, TemplateHolder {
     private final NamespacedKey key;
     private final Component name;
 
-    private final Map<String, Double> stats;
+    private final Map<String, String> stats;
+    private final Map<EffectOption, Boolean> options = new HashMap<>();
 
     private final int maxStacks;
     private final StackType stackType;
@@ -42,10 +45,17 @@ public class StatusEffect implements Keyed, TemplateHolder {
             ConfigurationSection statSection = section.getConfigurationSection("stats");
             for (String key : statSection.getKeys(false)) {
                 if (statSection.isSet(key))
-                    stats.put(key.toLowerCase(Locale.ROOT), statSection.getDouble(key));
+                    stats.put(key.toLowerCase(Locale.ROOT), statSection.getString(key));
             }
         } else {
             this.stats = null;
+        }
+
+        if (section.isConfigurationSection("options")) {
+            ConfigurationSection optionSection = section.getConfigurationSection("options");
+            for (String key : optionSection.getKeys(false)) {
+                options.put(EffectOption.fromPath(key), optionSection.getBoolean(key));
+            }
         }
 
         this.maxStacks = section.getInt("max-stacks", 1);
@@ -69,8 +79,12 @@ public class StatusEffect implements Keyed, TemplateHolder {
         return stats != null && !stats.isEmpty();
     }
 
-    public Map<String, Double> getStats() {
+    public Map<String, String> getStats() {
         return stats;
+    }
+
+    public boolean getOption(EffectOption option) {
+        return options.getOrDefault(option, option.defValue());
     }
 
     public int getMaxStacks() {

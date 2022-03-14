@@ -31,7 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @CommandAlias("mmobuffs|mmobuff|buffs|buff")
-@Description("Main mmobars command.")
+@Description("Main mmobuffs command.")
 public class MMOBuffsCommand extends BaseCommand {
     private final MMOBuffs plugin;
     private final LanguageManager language;
@@ -57,7 +57,7 @@ public class MMOBuffsCommand extends BaseCommand {
     @Description("Give an effect to a player.")
     @CommandCompletion("@players @effects @range:1-9 * @range:1-9 true|false")
     @Syntax("<player> <effect> <duration> [modifier] [stacks]")
-    public void onGiveCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, Integer duration, @Default("REPLACE") Modifier modifier,
+    public void onGiveCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, Integer duration, @Default("SET") Modifier modifier,
                               @Default("1") Integer stacks) {
         ActiveStatusEffect activeEffect = ActiveStatusEffect.builder(effect).startDuration(duration).startStacks(stacks).build();
         holder.addEffect(modifier, activeEffect);
@@ -91,7 +91,7 @@ public class MMOBuffsCommand extends BaseCommand {
     @CommandPermission("mmobuffs.clear")
     @Description("Remove a single effect, all non permanent effects, or every effect from a player.")
     @CommandCompletion("@players @effects|all|permanent true|false")
-    @Syntax("<player> <effect|all|permanent> [silent]")
+    @Syntax("<player> <effect|all|permanent>")
     public void onClearCommand(CommandSender sender, EffectHolder holder, String choice) {
         Component message;
         List<Template> templates = new ArrayList<>();
@@ -130,24 +130,67 @@ public class MMOBuffsCommand extends BaseCommand {
     public void onTimeCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, Operation operation, int duration) {
         if (holder.hasEffect(effect.getKey())) {
             ActiveStatusEffect activeEffect = holder.getEffect(effect.getKey());
+            int newDuration;
             switch (operation) {
-                case SET -> activeEffect.setDuration(duration);
-                case ADD -> activeEffect.setDuration(activeEffect.getDuration() + duration);
-                case SUBTRACT -> activeEffect.setDuration(activeEffect.getDuration() - duration);
-                case MULTIPLY -> activeEffect.setDuration(activeEffect.getDuration() * duration);
+                case SET -> newDuration = duration;
+                case ADD -> newDuration = activeEffect.getDuration() + duration;
+                case SUBTRACT -> newDuration = activeEffect.getDuration() - duration;
+                case MULTIPLY -> newDuration = activeEffect.getDuration() * duration;
                 case DIVIDE -> {
                     if (duration == 0)
                         throw new InvalidCommandArgument("Cannot divide by zero.");
-                    activeEffect.setDuration(activeEffect.getDuration() / duration);
+                    newDuration = activeEffect.getDuration() / duration;
                 }
+                default -> newDuration = activeEffect.getStacks();
             }
-        }
-        Collection<Template> templates = effect.getTemplates();
-        templates.add(Template.of("player", holder.getPlayer().getName()));
 
-        Component message = language.getMessage("time-effect", true, templates);
-        if (message != null)
-            sender.sendMessage(message);
+            activeEffect.setDuration(newDuration);
+
+            Collection<Template> templates = activeEffect.getTemplates();
+            templates.add(Template.of("player", holder.getPlayer().getName()));
+
+            Component message = language.getMessage("time-effect", true, templates);
+            if (message != null)
+                sender.sendMessage(message);
+        } else {
+            throw new InvalidCommandArgument("Player does not have that effect.");
+        }
+    }
+
+    // TODO: 1/6/2022 Add stack command that functions like time command.
+    @Subcommand("stack|stacks")
+    @CommandPermission("mmobuffs.stack")
+    @Description("Alter the stacks of an effect.")
+    @CommandCompletion("@players @effects * @range:1-9")
+    @Syntax("<player> <effect> <set|add|subtract|multiply|divide> <stacks>")
+    public void onStackCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, Operation operation, int stacks) {
+        if (holder.hasEffect(effect.getKey())) {
+            ActiveStatusEffect activeEffect = holder.getEffect(effect.getKey());
+            int newStacks;
+            switch (operation) {
+                case SET -> newStacks = stacks;
+                case ADD -> newStacks = activeEffect.getStacks() + stacks;
+                case SUBTRACT -> newStacks = activeEffect.getStacks() - stacks;
+                case MULTIPLY -> newStacks = activeEffect.getStacks() * stacks;
+                case DIVIDE -> {
+                    if (stacks == 0)
+                        throw new InvalidCommandArgument("Cannot divide by zero.");
+                    newStacks = activeEffect.getStacks() / stacks;
+                }
+                default -> newStacks = activeEffect.getStacks();
+            }
+
+            activeEffect.setStacks(newStacks);
+
+            Collection<Template> templates = activeEffect.getTemplates();
+            templates.add(Template.of("player", holder.getPlayer().getName()));
+
+            Component message = language.getMessage("stack-effect", true, templates);
+            if (message != null)
+                sender.sendMessage(message);
+        } else {
+            throw new InvalidCommandArgument("Player does not have that effect.");
+        }
     }
 
     @Subcommand("list")

@@ -7,11 +7,13 @@ import com.ehhthan.mmobuffs.api.effect.stack.StackType;
 import com.ehhthan.mmobuffs.api.modifier.Modifier;
 import com.google.common.base.Preconditions;
 import net.kyori.adventure.text.minimessage.Template;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class ActiveStatusEffect implements TemplateHolder {
+public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStatusEffect> {
     private final StatusEffect statusEffect;
     private final int startDuration;
     private final int startStacks;
@@ -65,13 +67,6 @@ public class ActiveStatusEffect implements TemplateHolder {
 
     public boolean isActive() {
         return active;
-    }
-
-    public double getStatValue(String key) {
-        if (MMOBuffs.getInst().hasStatHandler())
-            return MMOBuffs.getInst().getStatHandler().getValue(this, key);
-        else
-            return 0;
     }
 
     public boolean tick() {
@@ -129,8 +124,10 @@ public class ActiveStatusEffect implements TemplateHolder {
         templates.add(Template.of("start-duration", getStartDuration() + ""));
         templates.add(Template.of("start-stacks", getStartStacks() + ""));
 
-        for (String key : getStatusEffect().getStats().keySet()) {
-            templates.add(Template.of("stat:" + key, getStatValue(key) + ""));
+        if (MMOBuffs.getInst().hasStatHandler()) {
+            for (Map.Entry<String, String> entry : getStatusEffect().getStats().entrySet()) {
+                templates.add(Template.of("stat:" + entry.getKey(), entry.getValue() + ""));
+            }
         }
 
         templates.addAll(getStatusEffect().getTemplates());
@@ -141,9 +138,12 @@ public class ActiveStatusEffect implements TemplateHolder {
     public ActiveStatusEffect merge(Modifier modifier, ActiveStatusEffect latest) {
         Preconditions.checkArgument(statusEffect.getKey() == latest.statusEffect.getKey(),
             "Effects of two different types cannot be merged: %s + %s", statusEffect.getKey(), latest.statusEffect.getKey());
+        return mergeDuration(modifier, latest);
+    }
 
+    private ActiveStatusEffect mergeDuration(Modifier modifier, ActiveStatusEffect latest) {
         switch (modifier) {
-            case REPLACE -> {
+            case SET -> {
                 return latest;
             }
 
@@ -170,6 +170,15 @@ public class ActiveStatusEffect implements TemplateHolder {
 
             default -> throw new IllegalStateException("Unexpected value: " + modifier);
         }
+    }
+
+
+    @Override
+    public int compareTo(@NotNull ActiveStatusEffect o) {
+        if (isPermanent()) {
+            return (o.isPermanent()) ? 0 : 1;
+        } else
+            return Integer.compare(duration, o.duration);
     }
 
     @Override

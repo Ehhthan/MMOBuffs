@@ -22,7 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -50,7 +50,6 @@ public class EffectHolder implements PersistentDataHolder {
 
     private final Map<NamespacedKey, ActiveStatusEffect> effects = new HashMap<>();
 
-
     private final Player player;
     private BossBar bossBar;
 
@@ -67,7 +66,7 @@ public class EffectHolder implements PersistentDataHolder {
             if (savedEffects != null && savedEffects.length > 0)
                 for (ActiveStatusEffect effect : savedEffects) {
                     if (effect != null)
-                        addEffect(Modifier.REPLACE, effect);
+                        addEffect(Modifier.SET, effect);
                 }
         }
 
@@ -78,9 +77,9 @@ public class EffectHolder implements PersistentDataHolder {
                     cancel();
 
                 boolean display = false;
+                Collection<ActiveStatusEffect> values = effects.values();
 
-                if (effects.size() > 0) {
-                    Collection<ActiveStatusEffect> values = effects.values();
+                if (values.size() > 0) {
                     for (ActiveStatusEffect activeEffect : values) {
                         NamespacedKey key = activeEffect.getStatusEffect().getKey();
                         if (activeEffect.tick()) {
@@ -98,16 +97,22 @@ public class EffectHolder implements PersistentDataHolder {
                 if (bossBar != null) {
                     if (display) {
                         TextComponent.Builder builder = Component.text();
+                        // Creates a list of the displayable active status effects in ascending order.
+                        List<ActiveStatusEffect> sortedEffects = values.stream().filter(e -> e.getStatusEffect().hasDisplay()).sorted().toList();
 
-                        List<ActiveStatusEffect> sortedEffects = effects.values().stream().sorted(Comparator.comparingInt(ActiveStatusEffect::getDuration)).toList();
+                        // TODO: 1/6/2022 Sorting option in config
+                        // Checks if the effects should be descending and reverses if true.
+                        if (!MMOBuffs.getInst().getConfig().getBoolean("sorting.duration-ascending", true))
+                            Collections.reverse(sortedEffects);
+
+
                         for (int i = 0; i < sortedEffects.size(); i++) {
                             ActiveStatusEffect effect = sortedEffects.get(i);
-                            if (effect.getStatusEffect().hasDisplay()) {
-                                builder.append(effect.getStatusEffect().getDisplay().build(player, effect));
+                            builder.append(effect.getStatusEffect().getDisplay().build(player, effect));
 
-                                if (i != sortedEffects.size() - 1) {
-                                    builder.append(Component.text(config.getString("bossbar-display.effect-separator", " ")));
-                                }
+                            // Joins components with the separator.
+                            if (i != sortedEffects.size() - 1) {
+                                builder.append(Component.text(config.getString("bossbar-display.effect-separator", " ")));
                             }
                         }
 

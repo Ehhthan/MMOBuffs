@@ -34,15 +34,17 @@ public class CombatListener implements Listener {
     }
 
     private void call(Player player, StackType... types) {
-        EffectHolder holder = EffectHolder.get(player);
-        List<StackType> typeList = Arrays.asList(types);
+        if (EffectHolder.has(player)) {
+            EffectHolder holder = EffectHolder.get(player);
+            List<StackType> typeList = Arrays.asList(types);
 
-        Collection<ActiveStatusEffect> effects = holder.getEffects(true);
-        for (ActiveStatusEffect effect : effects) {
-            StackType type = effect.getStatusEffect().getStackType();
-            if (typeList.contains(type)) {
-                effect.tickStackEvent(type);
-                holder.updateEffect(effect.getStatusEffect().getKey());
+            Collection<ActiveStatusEffect> effects = holder.getEffects(true);
+            for (ActiveStatusEffect effect : effects) {
+                StackType type = effect.getStatusEffect().getStackType();
+                if (typeList.contains(type)) {
+                    effect.tickStackEvent(type);
+                    holder.updateEffect(effect.getStatusEffect().getKey());
+                }
             }
         }
     }

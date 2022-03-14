@@ -1,29 +1,37 @@
 package com.ehhthan.mmobuffs.listener;
 
-import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.EffectHolder;
 import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
+import com.ehhthan.mmobuffs.api.effect.option.EffectOption;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class WorldListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDeath(EntityDeathEvent event) {
-        if (event.getEntity() instanceof Player player) {
-            EffectHolder holder = EffectHolder.get(player);
-            Collection<ActiveStatusEffect> effects = holder.getEffects(true);
+        if (event.getEntity() instanceof Player player)
+            removeFalseOption(player, EffectOption.KEEP_ON_DEATH);
+    }
 
-            if (!MMOBuffs.getInst().getConfig().getBoolean("on-death.remove-timed-effects", true))
-                effects.removeIf(e -> !e.isPermanent());
-            if (!MMOBuffs.getInst().getConfig().getBoolean("on-death.remove-permanent-effects", false))
-                effects.removeIf(ActiveStatusEffect::isPermanent);
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onChangeWorld(PlayerChangedWorldEvent event) {
+        removeFalseOption(event.getPlayer(), EffectOption.KEEP_ON_WORLD_CHANGE);
+    }
 
-            effects.forEach(e -> holder.removeEffect(e.getStatusEffect().getKey()));
+    // Removes the effect if the option is false and activated.
+    private void removeFalseOption(Player player, EffectOption option) {
+        EffectHolder holder = EffectHolder.get(player);
+        for (NamespacedKey key : holder.getEffects(true).stream().filter(e -> !e.getStatusEffect().getOption(option))
+            .map(effect -> effect.getStatusEffect().getKey()).toList()) {
+            holder.removeEffect(key);
         }
     }
 }

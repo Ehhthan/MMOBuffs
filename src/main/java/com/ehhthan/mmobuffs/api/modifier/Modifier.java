@@ -1,14 +1,11 @@
 package com.ehhthan.mmobuffs.api.modifier;
 
+// TODO: 1/6/2022 generalize so can be used with stacks
 public enum Modifier {
     /**
-     * Overwrites the existing effect under the same name with the one specified.
-     * (For example, if you applied +10% PVE damage for 5 minutes, but want to replace
-     * it with +15% PVE damage for 2 minutes with the same effect name, then it
-     * will remove the effect and re-apply it with the new settings.)
-     * Use this as default if not specified in the command.
+     * Overwrites the existing value.
      */
-    REPLACE,
+    SET,
 
     /**
      * If the player already has the specified effect, do not modify anything. If the player
