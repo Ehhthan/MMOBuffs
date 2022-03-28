@@ -125,7 +125,7 @@ public class ActiveStatusEffect implements Resolver, Comparable<ActiveStatusEffe
             Placeholder.parsed("start-stacks", getStartStacks() + ""));
 
         for (Map.Entry<StatKey, StatValue> entry : getStatusEffect().getStats().entrySet()) {
-           resolver.resolver(Placeholder.parsed("stat:" + entry.getKey().getStat(), entry.getValue().toString()));
+           resolver.resolver(Placeholder.parsed("stat-" + entry.getKey().getStat(), entry.getValue().toString()));
         }
 
         resolver.resolver(getStatusEffect().getResolver());
