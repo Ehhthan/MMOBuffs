@@ -2,59 +2,76 @@ package com.ehhthan.mmobuffs.comp.stat.type;
 
 import com.ehhthan.mmobuffs.api.EffectHolder;
 import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
+import com.ehhthan.mmobuffs.api.stat.StatKey;
+import com.ehhthan.mmobuffs.api.stat.StatValue;
 import com.ehhthan.mmobuffs.comp.stat.StatHandler;
 import io.lumine.mythic.lib.api.player.MMOPlayerData;
 import io.lumine.mythic.lib.api.stat.modifier.StatModifier;
 import io.lumine.mythic.lib.player.modifier.ModifierType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
-import java.util.Map;
 
 public class MythicLibStatHandler implements StatHandler<MMOPlayerData> {
+    private final static String NAMESPACE = "mythiclib";
+
+    @NotNull
     @Override
-    public void edit(EffectHolder holder, EditType type, ActiveStatusEffect effect) {
-        if (holder.getPlayer().isOnline()) {
-            for (Map.Entry<String, String> entry : effect.getStatusEffect().getStats().entrySet()) {
-                // Example modifierKey: "<effect-name>:<stat-name>" or "defense-effect:max-health"
-                String modifierKey = effect.getStatusEffect().getKey().getKey() + ":" + entry.getKey();
+    public String namespace() {
+        return NAMESPACE;
+    }
 
-                String stat = entry.getKey().toUpperCase(Locale.ROOT);
-                String value = entry.getValue();
+    @Nullable
+    @Override
+    public MMOPlayerData adapt(@NotNull EffectHolder holder) {
+        return MMOPlayerData.get(holder.getPlayer().getUniqueId());
+    }
 
-                MMOPlayerData adapted = adapt(holder);
-                switch (type) {
-                    case ADD -> {
-                        ModifierType modifierType = value.toCharArray()[value.length() - 1] == '%' ? ModifierType.RELATIVE : ModifierType.FLAT;
-                        double numberValue = Double.parseDouble(modifierType == ModifierType.RELATIVE ? value.substring(0, value.length() - 1) : value);
+    @Override
+    public void add(@NotNull EffectHolder holder, @NotNull ActiveStatusEffect effect, @NotNull StatKey key, @NotNull StatValue value) {
+        MMOPlayerData adapted = adapt(holder);
+        if (adapted != null) {
+            double modifierValue = switch (effect.getStatusEffect().getStackType()) {
+                case NORMAL, CASCADING -> value.getValue() * effect.getStacks();
+                default -> value.getValue();
+            };
 
-                        numberValue = switch (effect.getStatusEffect().getStackType()) {
-                            case NORMAL, CASCADING -> numberValue * effect.getStacks();
-                            default -> numberValue;
-                        };
-
-                        adapted.getStatMap().getInstance(stat).addModifier(new StatModifier(modifierKey, stat, numberValue, modifierType));
-                    }
-                    case REMOVE -> adapted.getStatMap().getInstance(stat).remove(modifierKey);
-                }
-            }
+            String stat = key.getStat().toUpperCase(Locale.ROOT);
+            adapted.getStatMap().getInstance(stat).addModifier(new StatModifier(key.toString(), stat, modifierValue, adaptModifier(value.getType())));
         }
     }
 
     @Override
-    public String getValue(EffectHolder holder, String key) {
-        String[] split = key.split(":", 2);
-        if (split.length != 2)
-            return "0";
-
-        StatModifier modifier = adapt(holder).getStatMap().getInstance(split[1].toUpperCase(Locale.ROOT)).getModifier(key);
-        if (modifier != null)
-            return modifier.toString();
-        else
-            return "0";
+    public void remove(@NotNull EffectHolder holder, @NotNull StatKey key) {
+        MMOPlayerData adapted = adapt(holder);
+        if (adapted != null) {
+            adapted.getStatMap().getInstance(key.getStat().toUpperCase(Locale.ROOT)).remove(key.toString());
+        }
     }
 
+    @NotNull
     @Override
-    public MMOPlayerData adapt(EffectHolder holder) {
-        return MMOPlayerData.get(holder.getPlayer().getUniqueId());
+    public String getValue(@NotNull EffectHolder holder, @NotNull StatKey key) {
+        MMOPlayerData adapted = adapt(holder);
+        if (adapted != null) {
+            StatModifier modifier = adapted.getStatMap().getInstance(key.getStat()).getModifier(key.toString());
+            if (modifier != null)
+                return modifier.toString();
+        }
+        return "0";
+    }
+
+    /**
+     * Convert a buffs value type to mythiclib's ModifierType
+     * @param type Stat Value Type
+     * @return MythicLib's ModifierType
+     */
+    private ModifierType adaptModifier(StatValue.ValueType type) {
+        if (type == StatValue.ValueType.RELATIVE) {
+            return ModifierType.RELATIVE;
+        } else {
+            return ModifierType.FLAT;
+        }
     }
 }

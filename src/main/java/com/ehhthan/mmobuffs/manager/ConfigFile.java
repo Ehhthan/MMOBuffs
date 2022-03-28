@@ -46,19 +46,4 @@ public class ConfigFile {
             MMOBuffs.getInst().getLogger().log(Level.SEVERE, "Could not save " + name + ".yml: " + exception.getMessage());
         }
     }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void setup() {
-        try {
-            if (!new File(plugin.getDataFolder() + path).exists())
-                new File(plugin.getDataFolder() + path).mkdir();
-
-            if (!new File(plugin.getDataFolder() + path, name + ".yml").exists()) {
-                new File(plugin.getDataFolder() + path, name + ".yml").createNewFile();
-            }
-        } catch (IOException exception) {
-            MMOBuffs.getInst().getLogger().log(Level.SEVERE, "Could not generate " + name + ".yml: " + exception.getMessage());
-        }
-    }
-
 }

@@ -2,16 +2,19 @@ package com.ehhthan.mmobuffs.comp.stat;
 
 import com.ehhthan.mmobuffs.api.EffectHolder;
 import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
+import com.ehhthan.mmobuffs.api.stat.StatKey;
+import com.ehhthan.mmobuffs.api.stat.StatValue;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public interface StatHandler<T> {
-    void edit(EffectHolder holder, EditType type, ActiveStatusEffect effect);
+public interface StatHandler<P> {
+    @NotNull String namespace();
 
-    T adapt(EffectHolder holder);
+    @Nullable P adapt(@NotNull EffectHolder holder);
 
-    String getValue(EffectHolder holder, String key);
+    void add(@NotNull EffectHolder holder, @NotNull ActiveStatusEffect effect, @NotNull StatKey key, @NotNull StatValue value);
 
-    enum EditType {
-        ADD,
-        REMOVE
-    }
+    void remove(@NotNull EffectHolder holder, @NotNull StatKey key);
+
+    @NotNull String getValue(@NotNull EffectHolder holder, @NotNull StatKey key);
 }

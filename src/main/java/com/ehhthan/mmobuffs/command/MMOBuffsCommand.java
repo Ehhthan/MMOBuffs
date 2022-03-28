@@ -20,13 +20,12 @@ import com.ehhthan.mmobuffs.manager.type.LanguageManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,16 +54,15 @@ public class MMOBuffsCommand extends BaseCommand {
     @Subcommand("give|add")
     @CommandPermission("mmobuffs.give")
     @Description("Give an effect to a player.")
-    @CommandCompletion("@players @effects @range:1-9 * @range:1-9 true|false")
-    @Syntax("<player> <effect> <duration> [modifier] [stacks]")
-    public void onGiveCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, Integer duration, @Default("SET") Modifier modifier,
-                              @Default("1") Integer stacks) {
+    @CommandCompletion("@players @effects @range:1-9 * @range:1-9 *")
+    @Syntax("<player> <effect> <duration> [duration-modifier] [stacks] [stack-modifier]")
+    public void onGiveCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, Integer duration, @Default("SET") Modifier durationModifier,
+                              @Default("1") Integer stacks, @Default("KEEP") Modifier stackModifier) {
         ActiveStatusEffect activeEffect = ActiveStatusEffect.builder(effect).startDuration(duration).startStacks(stacks).build();
-        holder.addEffect(modifier, activeEffect);
+        holder.addEffect(activeEffect, durationModifier, stackModifier);
 
-        Collection<Template> templates = activeEffect.getTemplates();
-        templates.add(Template.of("player", holder.getPlayer().getName()));
-        Component message = language.getMessage("give-effect", true, templates);
+        TagResolver resolver = TagResolver.builder().resolvers(activeEffect.getResolver()).resolver(Placeholder.component("player", holder.getPlayer().displayName())).build();
+        Component message = language.getMessage("give-effect", true, resolver);
 
         if (message != null)
             sender.sendMessage(message);
@@ -73,15 +71,14 @@ public class MMOBuffsCommand extends BaseCommand {
     @Subcommand("permanent|perm")
     @CommandPermission("mmobuffs.permanent")
     @Description("Give a permanent effect to a player.")
-    @CommandCompletion("@players @effects * @range:1-9 true|false")
+    @CommandCompletion("@players @effects * @range:1-9 *")
     @Syntax("<player> <effect> [modifier] [stacks]")
-    public void onPermanentCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, @Default("REPLACE") Modifier modifier,
-                                   @Default("1") Integer stacks) {
-        holder.addEffect(modifier, ActiveStatusEffect.builder(effect).permanent(true).startStacks(stacks).build());
+    public void onPermanentCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, @Default("REPLACE") Modifier durationModifier,
+                                   @Default("1") Integer stacks, @Default("KEEP") Modifier stackModifier) {
+        holder.addEffect(ActiveStatusEffect.builder(effect).permanent(true).startStacks(stacks).build(), durationModifier, stackModifier);
 
-        Collection<Template> templates = effect.getTemplates();
-        templates.add(Template.of("player", holder.getPlayer().getName()));
-        Component message = language.getMessage("give-effect-permanent", true, templates);
+        TagResolver resolver = TagResolver.builder().resolvers(effect.getResolver()).resolver(Placeholder.component("player", holder.getPlayer().displayName())).build();
+        Component message = language.getMessage("give-effect-permanent", true, resolver);
 
         if (message != null)
             sender.sendMessage(message);
@@ -90,32 +87,30 @@ public class MMOBuffsCommand extends BaseCommand {
     @Subcommand("clear|remove")
     @CommandPermission("mmobuffs.clear")
     @Description("Remove a single effect, all non permanent effects, or every effect from a player.")
-    @CommandCompletion("@players @effects|all|permanent true|false")
+    @CommandCompletion("@players @effects|all|permanent")
     @Syntax("<player> <effect|all|permanent>")
     public void onClearCommand(CommandSender sender, EffectHolder holder, String choice) {
         Component message;
-        List<Template> templates = new ArrayList<>();
-        templates.add(Template.of("player", holder.getPlayer().getName()));
+        TagResolver.Single resolver = Placeholder.component("player", holder.getPlayer().displayName());
 
         switch (choice) {
             case "all" -> {
-                holder.removeAllEffects(false);
-                message = language.getMessage("clear-all-effects", true, templates);
+                holder.removeEffects(false);
+                message = language.getMessage("clear-all-effects", true, resolver);
             }
             case "permanent" -> {
-                holder.removeAllEffects(true);
-                message = language.getMessage("clear-permanent-effects", true, templates);
+                holder.removeEffects(true);
+                message = language.getMessage("clear-permanent-effects", true, resolver);
             }
             default -> {
                 NamespacedKey key = NamespacedKey.fromString(choice, plugin);
                 if (holder.hasEffect(key)) {
-                    templates.addAll(holder.getEffect(key).getTemplates());
                     holder.removeEffect(key);
                 }
                 else
                     throw new InvalidCommandArgument("Invalid effect option specified.");
 
-                message = language.getMessage("clear-effect", true, templates);
+                message = language.getMessage("clear-effect", true, TagResolver.builder().resolver(resolver).resolver(holder.getEffect(key).getResolver()).build());
             }
         }
         if (message != null)
@@ -146,10 +141,8 @@ public class MMOBuffsCommand extends BaseCommand {
 
             activeEffect.setDuration(newDuration);
 
-            Collection<Template> templates = activeEffect.getTemplates();
-            templates.add(Template.of("player", holder.getPlayer().getName()));
-
-            Component message = language.getMessage("time-effect", true, templates);
+            TagResolver resolver = TagResolver.builder().resolvers(activeEffect.getResolver()).resolver(Placeholder.component("player", holder.getPlayer().displayName())).build();
+            Component message = language.getMessage("time-effect", true, resolver);
             if (message != null)
                 sender.sendMessage(message);
         } else {
@@ -157,7 +150,6 @@ public class MMOBuffsCommand extends BaseCommand {
         }
     }
 
-    // TODO: 1/6/2022 Add stack command that functions like time command.
     @Subcommand("stack|stacks")
     @CommandPermission("mmobuffs.stack")
     @Description("Alter the stacks of an effect.")
@@ -181,11 +173,11 @@ public class MMOBuffsCommand extends BaseCommand {
             }
 
             activeEffect.setStacks(newStacks);
+            holder.updateEffect(effect.getKey());
 
-            Collection<Template> templates = activeEffect.getTemplates();
-            templates.add(Template.of("player", holder.getPlayer().getName()));
+            TagResolver resolver = TagResolver.builder().resolvers(activeEffect.getResolver()).resolver(Placeholder.component("player", holder.getPlayer().displayName())).build();
 
-            Component message = language.getMessage("stack-effect", true, templates);
+            Component message = language.getMessage("stack-effect", true, resolver);
             if (message != null)
                 sender.sendMessage(message);
         } else {
@@ -210,7 +202,7 @@ public class MMOBuffsCommand extends BaseCommand {
 
         String text = MMOBuffs.getInst().getLanguageManager().getString("list-display.effect-element");
         for (ActiveStatusEffect activeEffect : holder.getEffects(true)) {
-            components.add(MiniMessage.get().parse(MMOBuffs.getInst().getParserManager().parse(holder.getPlayer(), text), activeEffect.getTemplates()));
+            components.add(MiniMessage.miniMessage().deserialize((MMOBuffs.getInst().getParserManager().parse(holder.getPlayer(), text)), activeEffect.getResolver()));
         }
 
         TextComponent.Builder builder = Component.text();

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.logging.Level;
 
+@SuppressWarnings("ALL")
 public final class ConfigManager {
     private final MMOBuffs plugin;
 

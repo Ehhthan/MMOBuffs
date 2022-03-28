@@ -4,9 +4,12 @@ import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.effect.display.EffectDisplay;
 import com.ehhthan.mmobuffs.api.effect.option.EffectOption;
 import com.ehhthan.mmobuffs.api.effect.stack.StackType;
+import com.ehhthan.mmobuffs.api.stat.StatKey;
+import com.ehhthan.mmobuffs.api.stat.StatValue;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Keyed;
 import org.bukkit.NamespacedKey;
@@ -14,19 +17,16 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class StatusEffect implements Keyed, TemplateHolder {
+public class StatusEffect implements Keyed, Resolver {
     private final NamespacedKey key;
     private final Component name;
 
-    private final Map<String, String> stats;
+    private final Map<StatKey, StatValue> stats = new LinkedHashMap<>();
     private final Map<EffectOption, Boolean> options = new HashMap<>();
 
     private final int maxStacks;
@@ -37,18 +37,23 @@ public class StatusEffect implements Keyed, TemplateHolder {
     @SuppressWarnings("ConstantConditions")
     public StatusEffect(@NotNull ConfigurationSection section) {
         this.key = NamespacedKey.fromString(section.getName().toLowerCase(Locale.ROOT), MMOBuffs.getInst());
-        this.name = MiniMessage.get().parse(section.getString("display-name", WordUtils.capitalize(key.getKey())));
+        this.name = MiniMessage.miniMessage().deserialize(section.getString("display-name", WordUtils.capitalize(key.getKey())));
 
         if (section.isConfigurationSection("stats")) {
-            this.stats = new LinkedHashMap<>();
-
             ConfigurationSection statSection = section.getConfigurationSection("stats");
-            for (String key : statSection.getKeys(false)) {
-                if (statSection.isSet(key))
-                    stats.put(key.toLowerCase(Locale.ROOT), statSection.getString(key));
+            for (String stat : statSection.getKeys(false)) {
+                String[] split = stat.split(":", 2);
+
+                StatKey statKey;
+                if (split.length == 1)
+                    statKey = new StatKey(this, split[0]);
+                else if (split.length == 2)
+                    statKey = new StatKey(this, split[1], split[0]);
+                else
+                    continue;
+
+                stats.put(statKey, new StatValue(statSection.getString(stat)));
             }
-        } else {
-            this.stats = null;
         }
 
         if (section.isConfigurationSection("options")) {
@@ -76,10 +81,10 @@ public class StatusEffect implements Keyed, TemplateHolder {
     }
 
     public boolean hasStats() {
-        return stats != null && !stats.isEmpty();
+        return !stats.isEmpty();
     }
 
-    public Map<String, String> getStats() {
+    public Map<StatKey, StatValue> getStats() {
         return stats;
     }
 
@@ -104,13 +109,12 @@ public class StatusEffect implements Keyed, TemplateHolder {
     }
 
     @Override
-    public Collection<Template> getTemplates() {
-        List<Template> templates = new ArrayList<>();
+    public TagResolver getResolver() {
+        TagResolver.Builder resolver = TagResolver.builder()
+            .resolver(Placeholder.parsed("max-stacks", getMaxStacks() + ""))
+            .resolver(Placeholder.component("name", name))
+            .resolver(Placeholder.parsed("stack-type", WordUtils.capitalize(stackType.name().toLowerCase(Locale.ROOT))));
 
-        templates.add(Template.of("max-stacks", getMaxStacks() + ""));
-        templates.add(Template.of("name", name));
-        templates.add(Template.of("stack-type", WordUtils.capitalize(stackType.name().toLowerCase(Locale.ROOT))));
-
-        return templates;
+        return resolver.build();
     }
 }

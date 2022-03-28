@@ -1,19 +1,19 @@
 package com.ehhthan.mmobuffs.api.effect;
 
-import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.effect.display.duration.DurationDisplay;
 import com.ehhthan.mmobuffs.api.effect.display.duration.TimedDisplay;
 import com.ehhthan.mmobuffs.api.effect.stack.StackType;
 import com.ehhthan.mmobuffs.api.modifier.Modifier;
+import com.ehhthan.mmobuffs.api.stat.StatKey;
+import com.ehhthan.mmobuffs.api.stat.StatValue;
 import com.google.common.base.Preconditions;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStatusEffect> {
+public class ActiveStatusEffect implements Resolver, Comparable<ActiveStatusEffect> {
     private final StatusEffect statusEffect;
     private final int startDuration;
     private final int startStacks;
@@ -95,7 +95,7 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
         return false;
     }
 
-    public void tickStackEvent(StackType type) {
+    public void triggerStack(StackType type) {
         if (active && type == statusEffect.getStackType()) {
             switch (type) {
                 case ATTACK, HURT, COMBAT -> {
@@ -116,32 +116,36 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
     }
 
     @Override
-    public List<Template> getTemplates() {
-        List<Template> templates = new ArrayList<>();
-        templates.add(Template.of("seconds", getDuration() + ""));
-        templates.add(Template.of("duration", getDurationDisplay().display()));
-        templates.add(Template.of("stacks", getStacks() + ""));
-        templates.add(Template.of("start-duration", getStartDuration() + ""));
-        templates.add(Template.of("start-stacks", getStartStacks() + ""));
+    public TagResolver getResolver() {
+        TagResolver.Builder resolver = TagResolver.builder().resolvers(
+            Placeholder.parsed("seconds", getDuration() + ""),
+            Placeholder.component("duration", getDurationDisplay().display()),
+            Placeholder.parsed("stacks", getStacks() + ""),
+            Placeholder.parsed("start-duration", getStartDuration() + ""),
+            Placeholder.parsed("start-stacks", getStartStacks() + ""));
 
-        if (MMOBuffs.getInst().hasStatHandler()) {
-            for (Map.Entry<String, String> entry : getStatusEffect().getStats().entrySet()) {
-                templates.add(Template.of("stat:" + entry.getKey(), entry.getValue() + ""));
-            }
+        for (Map.Entry<StatKey, StatValue> entry : getStatusEffect().getStats().entrySet()) {
+           resolver.resolver(Placeholder.parsed("stat-" + entry.getKey().getStat(), entry.getValue().toString()));
         }
 
-        templates.addAll(getStatusEffect().getTemplates());
+        resolver.resolver(getStatusEffect().getResolver());
 
-        return templates;
+        return resolver.build();
     }
 
-    public ActiveStatusEffect merge(Modifier modifier, ActiveStatusEffect latest) {
+    public ActiveStatusEffect merge(ActiveStatusEffect latest, Modifier durationModifier, Modifier stackModifier) {
         Preconditions.checkArgument(statusEffect.getKey() == latest.statusEffect.getKey(),
             "Effects of two different types cannot be merged: %s + %s", statusEffect.getKey(), latest.statusEffect.getKey());
-        return mergeDuration(modifier, latest);
+
+        // Merge duration with specified modifier.
+        latest = mergeDuration(latest, durationModifier);
+        // Merge stacks with specified modifier.
+        latest = mergeStacks(latest, stackModifier);
+
+        return latest;
     }
 
-    private ActiveStatusEffect mergeDuration(Modifier modifier, ActiveStatusEffect latest) {
+    private ActiveStatusEffect mergeDuration(ActiveStatusEffect latest, Modifier modifier) {
         switch (modifier) {
             case SET -> {
                 return latest;
@@ -168,10 +172,41 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
                 return this;
             }
 
-            default -> throw new IllegalStateException("Unexpected value: " + modifier);
+            default -> throw new UnsupportedOperationException("Unexpected value: " + modifier);
         }
     }
 
+    private ActiveStatusEffect mergeStacks(ActiveStatusEffect latest, Modifier modifier) {
+        int maxStacks = statusEffect.getMaxStacks();
+        switch (modifier) {
+            case SET -> {
+                return latest;
+            }
+
+            case KEEP -> {
+                return this;
+            }
+
+            case REFRESH -> {
+                if (this.stacks < latest.stacks)
+                    this.stacks = Math.max(0, Math.min(maxStacks, latest.stacks));
+
+                return this;
+            }
+
+            case ADD -> {
+                this.stacks = Math.max(0, Math.min(maxStacks, this.stacks + latest.stacks));
+                return this;
+            }
+
+            case SUBTRACT -> {
+                this.stacks = Math.max(0, Math.min(maxStacks, this.stacks - latest.stacks));
+                return this;
+            }
+
+            default -> throw new UnsupportedOperationException("Unexpected value: " + modifier);
+        }
+    }
 
     @Override
     public int compareTo(@NotNull ActiveStatusEffect o) {
@@ -238,12 +273,12 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
         }
 
         public ActiveEffectBuilder startDuration(int startDuration) {
-            this.startDuration = startDuration;
+            this.startDuration = Math.max(0, startDuration);
             return this;
         }
 
         public ActiveEffectBuilder startStacks(int startStacks) {
-            this.startStacks = Math.min(effect.getMaxStacks(), startStacks);
+            this.startStacks = Math.max(0, Math.min(effect.getMaxStacks(), startStacks));
             return this;
         }
 

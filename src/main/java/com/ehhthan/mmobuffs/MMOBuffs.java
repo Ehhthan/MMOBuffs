@@ -7,14 +7,13 @@ import com.ehhthan.mmobuffs.api.effect.StatusEffect;
 import com.ehhthan.mmobuffs.command.MMOBuffsCommand;
 import com.ehhthan.mmobuffs.comp.parser.type.PlaceholderAPIParser;
 import com.ehhthan.mmobuffs.comp.placeholderapi.MMOBuffsExpansion;
-import com.ehhthan.mmobuffs.comp.stat.StatHandler;
-import com.ehhthan.mmobuffs.comp.stat.type.MythicLibStatHandler;
 import com.ehhthan.mmobuffs.listener.CombatListener;
 import com.ehhthan.mmobuffs.listener.WorldListener;
 import com.ehhthan.mmobuffs.manager.type.ConfigManager;
 import com.ehhthan.mmobuffs.manager.type.EffectManager;
 import com.ehhthan.mmobuffs.manager.type.LanguageManager;
 import com.ehhthan.mmobuffs.manager.type.ParserManager;
+import com.ehhthan.mmobuffs.manager.type.StatManager;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -30,9 +29,8 @@ public final class MMOBuffs extends JavaPlugin {
 
     private final ParserManager parserManager = new ParserManager();
 
-    private StatHandler<?> statHandler;
-
     private static MMOBuffs INSTANCE;
+    private StatManager statManager;
 
     public static MMOBuffs getInst() {
         return INSTANCE;
@@ -61,10 +59,7 @@ public final class MMOBuffs extends JavaPlugin {
             getLogger().log(Level.INFO, "PlaceholderAPI support detected.");
         }
 
-        if (Bukkit.getPluginManager().getPlugin("MythicLib") != null) {
-            setStatHandler(new MythicLibStatHandler());
-            getLogger().log(Level.INFO, "MythicLib support detected.");
-        }
+        this.statManager = new StatManager(this);
 
         getServer().getPluginManager().registerEvents(new EffectHolder.PlayerListener(), this);
         getServer().getPluginManager().registerEvents(new WorldListener(), this);
@@ -73,10 +68,6 @@ public final class MMOBuffs extends JavaPlugin {
         registerCommands();
 
         new Metrics(this, 13855);
-
-        if (!hasStatHandler()) {
-            getLogger().log(Level.WARNING, "No stat handler plugin has been registered.");
-        }
     }
 
     private void registerCommands() {
@@ -137,15 +128,7 @@ public final class MMOBuffs extends JavaPlugin {
         return parserManager;
     }
 
-    public boolean hasStatHandler() {
-        return statHandler != null;
-    }
-
-    public StatHandler<?> getStatHandler() {
-        return statHandler;
-    }
-
-    public void setStatHandler(StatHandler<?> statHandler) {
-        this.statHandler = statHandler;
+    public StatManager getStatManager() {
+        return statManager;
     }
 }

@@ -42,7 +42,7 @@ public class CombatListener implements Listener {
             for (ActiveStatusEffect effect : effects) {
                 StackType type = effect.getStatusEffect().getStackType();
                 if (typeList.contains(type)) {
-                    effect.tickStackEvent(type);
+                    effect.triggerStack(type);
                     holder.updateEffect(effect.getStatusEffect().getKey());
                 }
             }

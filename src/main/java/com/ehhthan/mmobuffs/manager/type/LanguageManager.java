@@ -5,11 +5,10 @@ import com.ehhthan.mmobuffs.manager.ConfigFile;
 import com.ehhthan.mmobuffs.manager.Reloadable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,16 +36,16 @@ public final class LanguageManager implements Reloadable {
 
     @Nullable
     public Component getMessage(@NotNull String path) {
-        return getMessage(path, true);
+        return getMessage(path, true, null);
     }
 
     @Nullable
-    public Component getMessage(@NotNull String path, boolean hasPrefix, Collection<Template> templates) {
-        return getMessage(path, hasPrefix, templates.toArray(Template[]::new));
+    public Component getMessage(@NotNull String path, boolean hasPrefix) {
+        return getMessage(path, hasPrefix, null);
     }
 
     @Nullable
-    public Component getMessage(@NotNull String path, boolean hasPrefix, Template... templates) {
+    public Component getMessage(@NotNull String path, boolean hasPrefix, @Nullable TagResolver resolver) {
         String prefix = (hasPrefix) ? language.getConfig().getString("prefix", "") : "";
         String found = language.getConfig().getString(path);
 
@@ -66,9 +65,9 @@ public final class LanguageManager implements Reloadable {
             input = prefix + found;
         }
 
-        if (templates != null && templates.length > 0)
-            return MiniMessage.get().parse(input, templates);
+        if (resolver != null)
+            return MiniMessage.miniMessage().deserialize(input, resolver);
         else
-            return MiniMessage.get().parse(input);
+            return MiniMessage.miniMessage().deserialize(input);
     }
 }
