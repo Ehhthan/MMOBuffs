@@ -16,12 +16,6 @@ import org.jetbrains.annotations.Nullable;
 public class AureliumSkillsStatHandler implements StatHandler<PlayerData> {
     private static final String NAMESPACE = "aureliumskills";
 
-    private final AureliumSkills plugin;
-
-    public AureliumSkillsStatHandler() {
-        this.plugin = AureliumAPI.getPlugin();
-    }
-
     @NotNull
     @Override
     public String namespace() {
@@ -31,7 +25,7 @@ public class AureliumSkillsStatHandler implements StatHandler<PlayerData> {
     @Nullable
     @Override
     public PlayerData adapt(@NotNull EffectHolder holder) {
-        return plugin.getPlayerManager().getPlayerData(holder.getPlayer());
+        return AureliumAPI.getPlugin().getPlayerManager().getPlayerData(holder.getPlayer());
     }
 
     @Override
@@ -43,7 +37,7 @@ public class AureliumSkillsStatHandler implements StatHandler<PlayerData> {
                 default -> value.getValue();
             };
 
-            Stat stat = plugin.getStatRegistry().getStat(key.getStat());
+            Stat stat = AureliumAPI.getPlugin().getStatRegistry().getStat(key.getStat());
             if (stat != null)
                 adapted.addStatModifier(new StatModifier(key.toString(), stat, modifierValue));
         }
