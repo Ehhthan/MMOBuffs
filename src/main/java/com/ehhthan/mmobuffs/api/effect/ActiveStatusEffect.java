@@ -273,12 +273,12 @@ public class ActiveStatusEffect implements Resolver, Comparable<ActiveStatusEffe
         }
 
         public ActiveEffectBuilder startDuration(int startDuration) {
-            this.startDuration = startDuration;
+            this.startDuration = Math.max(0, startDuration);
             return this;
         }
 
         public ActiveEffectBuilder startStacks(int startStacks) {
-            this.startStacks = Math.min(effect.getMaxStacks(), startStacks);
+            this.startStacks = Math.max(0, Math.min(effect.getMaxStacks(), startStacks));
             return this;
         }
 

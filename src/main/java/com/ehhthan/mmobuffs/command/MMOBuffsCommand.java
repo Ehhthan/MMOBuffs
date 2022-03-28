@@ -54,7 +54,7 @@ public class MMOBuffsCommand extends BaseCommand {
     @Subcommand("give|add")
     @CommandPermission("mmobuffs.give")
     @Description("Give an effect to a player.")
-    @CommandCompletion("@players @effects @range:1-9 * @range:1-9 true|false")
+    @CommandCompletion("@players @effects @range:1-9 * @range:1-9 *")
     @Syntax("<player> <effect> <duration> [duration-modifier] [stacks] [stack-modifier]")
     public void onGiveCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, Integer duration, @Default("SET") Modifier durationModifier,
                               @Default("1") Integer stacks, @Default("KEEP") Modifier stackModifier) {
@@ -71,7 +71,7 @@ public class MMOBuffsCommand extends BaseCommand {
     @Subcommand("permanent|perm")
     @CommandPermission("mmobuffs.permanent")
     @Description("Give a permanent effect to a player.")
-    @CommandCompletion("@players @effects * @range:1-9 true|false")
+    @CommandCompletion("@players @effects * @range:1-9 *")
     @Syntax("<player> <effect> [modifier] [stacks]")
     public void onPermanentCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, @Default("REPLACE") Modifier durationModifier,
                                    @Default("1") Integer stacks, @Default("KEEP") Modifier stackModifier) {
@@ -87,7 +87,7 @@ public class MMOBuffsCommand extends BaseCommand {
     @Subcommand("clear|remove")
     @CommandPermission("mmobuffs.clear")
     @Description("Remove a single effect, all non permanent effects, or every effect from a player.")
-    @CommandCompletion("@players @effects|all|permanent true|false")
+    @CommandCompletion("@players @effects|all|permanent")
     @Syntax("<player> <effect|all|permanent>")
     public void onClearCommand(CommandSender sender, EffectHolder holder, String choice) {
         Component message;
