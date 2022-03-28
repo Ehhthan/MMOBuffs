@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -86,7 +88,7 @@ public class EffectHolder implements PersistentDataHolder {
         @Override
         public void run() {
             // Creates a list of the displayable active status effects in ascending order.
-            List<ActiveStatusEffect> sortedEffects = effects.values().stream().filter(e -> e.getStatusEffect().hasDisplay()).sorted().toList();
+            List<ActiveStatusEffect> sortedEffects = new LinkedList<>(effects.values().stream().filter(e -> e.getStatusEffect().hasDisplay()).sorted().toList());
             if (sortedEffects.size() > 0) {
                 TextComponent.Builder builder = Component.text();
                 // Checks if the effects should be descending and reverses.
@@ -106,7 +108,8 @@ public class EffectHolder implements PersistentDataHolder {
                 bossBar.name(builder.build());
                 player.showBossBar(bossBar);
             } else {
-                player.hideBossBar(bossBar);
+                if (!MMOBuffs.getInst().getConfig().getBoolean("bossbar-display.display-when-empty", false))
+                    player.hideBossBar(bossBar);
             }
         }
     };
@@ -135,6 +138,9 @@ public class EffectHolder implements PersistentDataHolder {
 
         effectUpdater.runTaskTimer(MMOBuffs.getInst(), 1, 20);
         bossBarUpdater.runTaskTimer(MMOBuffs.getInst(), 2, MMOBuffs.getInst().getConfig().getInt("bossbar-display.update-ticks", 20));
+
+        if (MMOBuffs.getInst().getConfig().getBoolean("bossbar-display.display-when-empty", false))
+            player.showBossBar(bossBar);
     }
 
     public Player getPlayer() {
