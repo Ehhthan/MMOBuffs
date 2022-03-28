@@ -1,9 +1,9 @@
 package com.ehhthan.mmobuffs.comp.stat;
 
 import com.ehhthan.mmobuffs.api.EffectHolder;
+import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import com.ehhthan.mmobuffs.api.stat.StatKey;
 import com.ehhthan.mmobuffs.api.stat.StatValue;
-import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

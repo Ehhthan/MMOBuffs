@@ -20,13 +20,12 @@ import com.ehhthan.mmobuffs.manager.type.LanguageManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -62,9 +61,8 @@ public class MMOBuffsCommand extends BaseCommand {
         ActiveStatusEffect activeEffect = ActiveStatusEffect.builder(effect).startDuration(duration).startStacks(stacks).build();
         holder.addEffect(modifier, activeEffect);
 
-        Collection<Template> templates = activeEffect.getTemplates();
-        templates.add(Template.of("player", holder.getPlayer().getName()));
-        Component message = language.getMessage("give-effect", true, templates);
+        TagResolver resolver = TagResolver.builder().resolvers(activeEffect.getResolver()).resolver(Placeholder.component("player", holder.getPlayer().displayName())).build();
+        Component message = language.getMessage("give-effect", true, resolver);
 
         if (message != null)
             sender.sendMessage(message);
@@ -79,9 +77,8 @@ public class MMOBuffsCommand extends BaseCommand {
                                    @Default("1") Integer stacks) {
         holder.addEffect(modifier, ActiveStatusEffect.builder(effect).permanent(true).startStacks(stacks).build());
 
-        Collection<Template> templates = effect.getTemplates();
-        templates.add(Template.of("player", holder.getPlayer().getName()));
-        Component message = language.getMessage("give-effect-permanent", true, templates);
+        TagResolver resolver = TagResolver.builder().resolvers(effect.getResolver()).resolver(Placeholder.component("player", holder.getPlayer().displayName())).build();
+        Component message = language.getMessage("give-effect-permanent", true, resolver);
 
         if (message != null)
             sender.sendMessage(message);
@@ -94,28 +91,26 @@ public class MMOBuffsCommand extends BaseCommand {
     @Syntax("<player> <effect|all|permanent>")
     public void onClearCommand(CommandSender sender, EffectHolder holder, String choice) {
         Component message;
-        List<Template> templates = new ArrayList<>();
-        templates.add(Template.of("player", holder.getPlayer().getName()));
+        TagResolver.Single resolver = Placeholder.component("player", holder.getPlayer().displayName());
 
         switch (choice) {
             case "all" -> {
                 holder.removeEffects(false);
-                message = language.getMessage("clear-all-effects", true, templates);
+                message = language.getMessage("clear-all-effects", true, resolver);
             }
             case "permanent" -> {
                 holder.removeEffects(true);
-                message = language.getMessage("clear-permanent-effects", true, templates);
+                message = language.getMessage("clear-permanent-effects", true, resolver);
             }
             default -> {
                 NamespacedKey key = NamespacedKey.fromString(choice, plugin);
                 if (holder.hasEffect(key)) {
-                    templates.addAll(holder.getEffect(key).getTemplates());
                     holder.removeEffect(key);
                 }
                 else
                     throw new InvalidCommandArgument("Invalid effect option specified.");
 
-                message = language.getMessage("clear-effect", true, templates);
+                message = language.getMessage("clear-effect", true, TagResolver.builder().resolver(resolver).resolver(holder.getEffect(key).getResolver()).build());
             }
         }
         if (message != null)
@@ -146,10 +141,8 @@ public class MMOBuffsCommand extends BaseCommand {
 
             activeEffect.setDuration(newDuration);
 
-            Collection<Template> templates = activeEffect.getTemplates();
-            templates.add(Template.of("player", holder.getPlayer().getName()));
-
-            Component message = language.getMessage("time-effect", true, templates);
+            TagResolver resolver = TagResolver.builder().resolvers(activeEffect.getResolver()).resolver(Placeholder.component("player", holder.getPlayer().displayName())).build();
+            Component message = language.getMessage("time-effect", true, resolver);
             if (message != null)
                 sender.sendMessage(message);
         } else {
@@ -182,10 +175,9 @@ public class MMOBuffsCommand extends BaseCommand {
 
             activeEffect.setStacks(newStacks);
 
-            Collection<Template> templates = activeEffect.getTemplates();
-            templates.add(Template.of("player", holder.getPlayer().getName()));
+            TagResolver resolver = TagResolver.builder().resolvers(activeEffect.getResolver()).resolver(Placeholder.component("player", holder.getPlayer().displayName())).build();
 
-            Component message = language.getMessage("stack-effect", true, templates);
+            Component message = language.getMessage("stack-effect", true, resolver);
             if (message != null)
                 sender.sendMessage(message);
         } else {
@@ -210,7 +202,7 @@ public class MMOBuffsCommand extends BaseCommand {
 
         String text = MMOBuffs.getInst().getLanguageManager().getString("list-display.effect-element");
         for (ActiveStatusEffect activeEffect : holder.getEffects(true)) {
-            components.add(MiniMessage.get().parse(MMOBuffs.getInst().getParserManager().parse(holder.getPlayer(), text), activeEffect.getTemplates()));
+            components.add(MiniMessage.miniMessage().deserialize((MMOBuffs.getInst().getParserManager().parse(holder.getPlayer(), text)), activeEffect.getResolver()));
         }
 
         TextComponent.Builder builder = Component.text();

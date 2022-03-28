@@ -4,7 +4,7 @@ import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 
 import java.time.Duration;
 import java.util.LinkedList;
@@ -98,7 +98,7 @@ public class TimedDisplay implements DurationDisplay {
         Component format(Duration duration) {
             int value = partFromDuration(duration);
             return (value > 0) ? MMOBuffs.getInst().getLanguageManager().
-                getMessage("duration-display." + id, false, Template.of("value", value + "")) : Component.empty();
+                getMessage("duration-display." + id, false, Placeholder.parsed("value", value + "")) : Component.empty();
         }
     }
 }

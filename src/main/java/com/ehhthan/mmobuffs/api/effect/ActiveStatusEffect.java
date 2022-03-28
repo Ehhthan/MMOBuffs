@@ -1,20 +1,19 @@
 package com.ehhthan.mmobuffs.api.effect;
 
-import com.ehhthan.mmobuffs.api.stat.StatKey;
-import com.ehhthan.mmobuffs.api.stat.StatValue;
 import com.ehhthan.mmobuffs.api.effect.display.duration.DurationDisplay;
 import com.ehhthan.mmobuffs.api.effect.display.duration.TimedDisplay;
 import com.ehhthan.mmobuffs.api.effect.stack.StackType;
 import com.ehhthan.mmobuffs.api.modifier.Modifier;
+import com.ehhthan.mmobuffs.api.stat.StatKey;
+import com.ehhthan.mmobuffs.api.stat.StatValue;
 import com.google.common.base.Preconditions;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStatusEffect> {
+public class ActiveStatusEffect implements Resolver, Comparable<ActiveStatusEffect> {
     private final StatusEffect statusEffect;
     private final int startDuration;
     private final int startStacks;
@@ -117,21 +116,19 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
     }
 
     @Override
-    public List<Template> getTemplates() {
-        List<Template> templates = new ArrayList<>();
-        templates.add(Template.of("seconds", getDuration() + ""));
-        templates.add(Template.of("duration", getDurationDisplay().display()));
-        templates.add(Template.of("stacks", getStacks() + ""));
-        templates.add(Template.of("start-duration", getStartDuration() + ""));
-        templates.add(Template.of("start-stacks", getStartStacks() + ""));
+    public TagResolver getResolver() {
+        TagResolver.Builder resolver = TagResolver.builder().resolvers(
+            Placeholder.parsed("seconds", getDuration() + ""),
+            Placeholder.component("duration", getDurationDisplay().display()),
+            Placeholder.parsed("stacks", getStacks() + ""),
+            Placeholder.parsed("start-duration", getStartDuration() + ""),
+            Placeholder.parsed("start-stacks", getStartStacks() + ""));
 
         for (Map.Entry<StatKey, StatValue> entry : getStatusEffect().getStats().entrySet()) {
-            templates.add(Template.of("stat:" + entry.getKey().getStat(), entry.getValue().toString()));
+           resolver.resolver(Placeholder.parsed("stat:" + entry.getKey().getStat(), entry.getValue().toString()));
         }
 
-        templates.addAll(getStatusEffect().getTemplates());
-
-        return templates;
+        return resolver.build();
     }
 
     public ActiveStatusEffect merge(Modifier modifier, ActiveStatusEffect latest) {

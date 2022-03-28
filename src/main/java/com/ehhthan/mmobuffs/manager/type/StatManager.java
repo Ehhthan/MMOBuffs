@@ -2,9 +2,9 @@ package com.ehhthan.mmobuffs.manager.type;
 
 import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.EffectHolder;
+import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import com.ehhthan.mmobuffs.api.stat.StatKey;
 import com.ehhthan.mmobuffs.api.stat.StatValue;
-import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import com.ehhthan.mmobuffs.comp.stat.StatHandler;
 import com.ehhthan.mmobuffs.comp.stat.type.AureliumSkillsStatHandler;
 import com.ehhthan.mmobuffs.comp.stat.type.MythicLibStatHandler;

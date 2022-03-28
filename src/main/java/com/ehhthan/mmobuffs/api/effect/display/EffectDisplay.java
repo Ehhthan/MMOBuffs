@@ -5,7 +5,8 @@ import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Template;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -33,10 +34,9 @@ public class EffectDisplay {
     }
 
     public Component build(@NotNull Player player, @NotNull ActiveStatusEffect effect) {
-        List<Template> templates = effect.getTemplates();
-        templates.add(Template.of("icon", StringEscapeUtils.unescapeJava(icon)));
+        TagResolver resolver = TagResolver.builder().resolver(effect.getResolver()).resolver(Placeholder.parsed("icon", StringEscapeUtils.unescapeJava(icon))).build();
 
-        Component parsed = MiniMessage.get().parse(MMOBuffs.getInst().getParserManager().parse(player, StringEscapeUtils.unescapeJava(text)), templates);
+        Component parsed = MiniMessage.miniMessage().deserialize((MMOBuffs.getInst().getParserManager().parse(player, StringEscapeUtils.unescapeJava(text))), resolver);
 
         FileConfiguration config = MMOBuffs.getInst().getConfig();
         if (config.getBoolean("resource-pack.enabled")) {
