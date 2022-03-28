@@ -10,8 +10,10 @@
 * [Commands](features/commands.md)
 * [Modifiers](features/modifiers.md)
 * [Stack Types](features/stack-types.md)
+* [Options](features/options.md)
 
 ## Configuration
 
 * [Config](configuration/config.md)
-* [Effects](configuration/effects.md)
+* [Effects](configuration/effects/README.md)
+  * [Stat Format](configuration/effects/stat-format.md)

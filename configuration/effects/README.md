@@ -9,7 +9,7 @@ strong:
   max-stacks: 4
   stack-type: normal
   stats:
-    defense: 10
+    defense: 10%
     armor: 1
     max_health: 2
   display:

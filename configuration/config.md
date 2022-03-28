@@ -11,6 +11,13 @@ resource-pack:
 bossbar-display:
   enabled: true
 
+  # How often the bossbar should update in ticks.
+  update-ticks: 20
+
+  # If the bossbar should continue to display even when the holder has no buffs.
+  display-when-empty: false
+
+  # What characters should separate the effects in the bossbar.
   effect-separator: " "
 
   # Possible colors: white, purple, yellow, green, red, blue, and pink.
@@ -22,6 +29,11 @@ bossbar-display:
   # Default percentage value of the bossbar. Value must be between [0,1].
   value: 0
 
+stat-handler:
+  # The default stat handler to use if not specified.
+  # Natively Supported: mythiclib, aureliumskills
+  default: mythiclib
+
 # How effects are sorted when displayed.
 sorting:
   # If true the effects with the lowest duration left will be displayed first.
@@ -30,5 +42,5 @@ sorting:
 # Whether to use a shortened display.
 shorten-duration-display: true
 
-config-version: 2
+config-version: 3
 ```
