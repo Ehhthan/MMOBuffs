@@ -19,7 +19,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -132,7 +131,7 @@ public class EffectHolder implements PersistentDataHolder {
             if (savedEffects != null && savedEffects.length > 0)
                 for (ActiveStatusEffect effect : savedEffects) {
                     if (effect != null)
-                        addEffect(Modifier.SET, effect);
+                        addEffect(effect, Modifier.SET, Modifier.SET);
                 }
         }
 
@@ -156,12 +155,12 @@ public class EffectHolder implements PersistentDataHolder {
         Bukkit.getScheduler().runTask(MMOBuffs.getInst(), () -> MMOBuffs.getInst().getStatManager().add(this, effects.get(key)));
     }
 
-    public void addEffect(Modifier modifier, ActiveStatusEffect effect) {
+    public void addEffect(ActiveStatusEffect effect, Modifier durationModifier, Modifier stackModifier) {
         NamespacedKey key = effect.getStatusEffect().getKey();
 
         Bukkit.getScheduler().runTask(MMOBuffs.getInst(), () -> {
             if (effects.containsKey(key))
-                effects.put(key, effects.get(key).merge(modifier, effect));
+                effects.put(key, effects.get(key).merge(effect, durationModifier, stackModifier));
             else
                 effects.put(key, effect);
 

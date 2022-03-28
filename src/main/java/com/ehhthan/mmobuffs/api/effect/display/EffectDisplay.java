@@ -14,8 +14,6 @@ import org.bukkit.entity.Player;
 import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 public class EffectDisplay {
     private final String icon;
     private final String text;

@@ -2,7 +2,6 @@ package com.ehhthan.mmobuffs.api.effect.option;
 
 import java.util.Locale;
 
-// TODO: 1/17/2022 Implement this
 public enum EffectOption {
     KEEP_ON_DEATH(false),
     KEEP_ON_WORLD_CHANGE(true);

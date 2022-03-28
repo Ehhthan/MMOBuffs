@@ -55,11 +55,11 @@ public class MMOBuffsCommand extends BaseCommand {
     @CommandPermission("mmobuffs.give")
     @Description("Give an effect to a player.")
     @CommandCompletion("@players @effects @range:1-9 * @range:1-9 true|false")
-    @Syntax("<player> <effect> <duration> [modifier] [stacks]")
-    public void onGiveCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, Integer duration, @Default("SET") Modifier modifier,
-                              @Default("1") Integer stacks) {
+    @Syntax("<player> <effect> <duration> [duration-modifier] [stacks] [stack-modifier]")
+    public void onGiveCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, Integer duration, @Default("SET") Modifier durationModifier,
+                              @Default("1") Integer stacks, @Default("KEEP") Modifier stackModifier) {
         ActiveStatusEffect activeEffect = ActiveStatusEffect.builder(effect).startDuration(duration).startStacks(stacks).build();
-        holder.addEffect(modifier, activeEffect);
+        holder.addEffect(activeEffect, durationModifier, stackModifier);
 
         TagResolver resolver = TagResolver.builder().resolvers(activeEffect.getResolver()).resolver(Placeholder.component("player", holder.getPlayer().displayName())).build();
         Component message = language.getMessage("give-effect", true, resolver);
@@ -73,9 +73,9 @@ public class MMOBuffsCommand extends BaseCommand {
     @Description("Give a permanent effect to a player.")
     @CommandCompletion("@players @effects * @range:1-9 true|false")
     @Syntax("<player> <effect> [modifier] [stacks]")
-    public void onPermanentCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, @Default("REPLACE") Modifier modifier,
-                                   @Default("1") Integer stacks) {
-        holder.addEffect(modifier, ActiveStatusEffect.builder(effect).permanent(true).startStacks(stacks).build());
+    public void onPermanentCommand(CommandSender sender, EffectHolder holder, StatusEffect effect, @Default("REPLACE") Modifier durationModifier,
+                                   @Default("1") Integer stacks, @Default("KEEP") Modifier stackModifier) {
+        holder.addEffect(ActiveStatusEffect.builder(effect).permanent(true).startStacks(stacks).build(), durationModifier, stackModifier);
 
         TagResolver resolver = TagResolver.builder().resolvers(effect.getResolver()).resolver(Placeholder.component("player", holder.getPlayer().displayName())).build();
         Component message = language.getMessage("give-effect-permanent", true, resolver);
@@ -150,7 +150,6 @@ public class MMOBuffsCommand extends BaseCommand {
         }
     }
 
-    // TODO: 1/6/2022 Add stack command that functions like time command.
     @Subcommand("stack|stacks")
     @CommandPermission("mmobuffs.stack")
     @Description("Alter the stacks of an effect.")
@@ -174,6 +173,7 @@ public class MMOBuffsCommand extends BaseCommand {
             }
 
             activeEffect.setStacks(newStacks);
+            holder.updateEffect(effect.getKey());
 
             TagResolver resolver = TagResolver.builder().resolvers(activeEffect.getResolver()).resolver(Placeholder.component("player", holder.getPlayer().displayName())).build();
 

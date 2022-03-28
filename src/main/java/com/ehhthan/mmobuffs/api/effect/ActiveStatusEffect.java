@@ -133,13 +133,19 @@ public class ActiveStatusEffect implements Resolver, Comparable<ActiveStatusEffe
         return resolver.build();
     }
 
-    public ActiveStatusEffect merge(Modifier modifier, ActiveStatusEffect latest) {
+    public ActiveStatusEffect merge(ActiveStatusEffect latest, Modifier durationModifier, Modifier stackModifier) {
         Preconditions.checkArgument(statusEffect.getKey() == latest.statusEffect.getKey(),
             "Effects of two different types cannot be merged: %s + %s", statusEffect.getKey(), latest.statusEffect.getKey());
-        return mergeDuration(modifier, latest);
+
+        // Merge duration with specified modifier.
+        latest = mergeDuration(latest, durationModifier);
+        // Merge stacks with specified modifier.
+        latest = mergeStacks(latest, stackModifier);
+
+        return latest;
     }
 
-    private ActiveStatusEffect mergeDuration(Modifier modifier, ActiveStatusEffect latest) {
+    private ActiveStatusEffect mergeDuration(ActiveStatusEffect latest, Modifier modifier) {
         switch (modifier) {
             case SET -> {
                 return latest;
@@ -166,10 +172,41 @@ public class ActiveStatusEffect implements Resolver, Comparable<ActiveStatusEffe
                 return this;
             }
 
-            default -> throw new IllegalStateException("Unexpected value: " + modifier);
+            default -> throw new UnsupportedOperationException("Unexpected value: " + modifier);
         }
     }
 
+    private ActiveStatusEffect mergeStacks(ActiveStatusEffect latest, Modifier modifier) {
+        int maxStacks = statusEffect.getMaxStacks();
+        switch (modifier) {
+            case SET -> {
+                return latest;
+            }
+
+            case KEEP -> {
+                return this;
+            }
+
+            case REFRESH -> {
+                if (this.stacks < latest.stacks)
+                    this.stacks = Math.max(0, Math.min(maxStacks, latest.stacks));
+
+                return this;
+            }
+
+            case ADD -> {
+                this.stacks = Math.max(0, Math.min(maxStacks, this.stacks + latest.stacks));
+                return this;
+            }
+
+            case SUBTRACT -> {
+                this.stacks = Math.max(0, Math.min(maxStacks, this.stacks - latest.stacks));
+                return this;
+            }
+
+            default -> throw new UnsupportedOperationException("Unexpected value: " + modifier);
+        }
+    }
 
     @Override
     public int compareTo(@NotNull ActiveStatusEffect o) {
