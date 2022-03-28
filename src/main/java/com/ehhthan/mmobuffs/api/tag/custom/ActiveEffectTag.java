@@ -21,7 +21,6 @@ public class ActiveEffectTag implements PersistentDataType<PersistentDataContain
 
     private static final NamespacedKey DURATION = key("duration");
     private static final NamespacedKey STACKS = key("stacks");
-    private static final NamespacedKey DISPLAY = key("display");
     private static final NamespacedKey PERMANENT = key("permanent");
 
     @Override

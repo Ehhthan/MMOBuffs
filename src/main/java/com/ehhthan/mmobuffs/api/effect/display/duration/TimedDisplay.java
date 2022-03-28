@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 
+@SuppressWarnings("ClassCanBeRecord")
 public class TimedDisplay implements DurationDisplay {
     private static final Function<Duration, Component> LONG_DISPLAY_FORMAT = (duration) -> {
         List<Component> components = new LinkedList<>();

@@ -7,8 +7,6 @@ import com.ehhthan.mmobuffs.api.effect.StatusEffect;
 import com.ehhthan.mmobuffs.command.MMOBuffsCommand;
 import com.ehhthan.mmobuffs.comp.parser.type.PlaceholderAPIParser;
 import com.ehhthan.mmobuffs.comp.placeholderapi.MMOBuffsExpansion;
-import com.ehhthan.mmobuffs.comp.stat.StatHandler;
-import com.ehhthan.mmobuffs.comp.stat.type.MythicLibStatHandler;
 import com.ehhthan.mmobuffs.listener.CombatListener;
 import com.ehhthan.mmobuffs.listener.WorldListener;
 import com.ehhthan.mmobuffs.manager.type.ConfigManager;

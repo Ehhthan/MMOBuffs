@@ -4,7 +4,6 @@ import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import com.ehhthan.mmobuffs.api.modifier.Modifier;
 import com.ehhthan.mmobuffs.api.tag.CustomTagTypes;
-import com.ehhthan.mmobuffs.comp.stat.StatHandler;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -23,7 +22,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -149,9 +147,7 @@ public class EffectHolder implements PersistentDataHolder {
     }
 
     public void updateEffect(NamespacedKey key) {
-        Bukkit.getScheduler().runTask(MMOBuffs.getInst(), () -> {
-            MMOBuffs.getInst().getStatManager().add(this, effects.get(key));
-        });
+        Bukkit.getScheduler().runTask(MMOBuffs.getInst(), () -> MMOBuffs.getInst().getStatManager().add(this, effects.get(key)));
     }
 
     public void addEffect(Modifier modifier, ActiveStatusEffect effect) {
