@@ -109,6 +109,8 @@ public class EffectHolder implements PersistentDataHolder {
             } else {
                 if (!MMOBuffs.getInst().getConfig().getBoolean("bossbar-display.display-when-empty", false))
                     player.hideBossBar(bossBar);
+                else
+                    bossBar.name(Component.empty());
             }
         }
     };
