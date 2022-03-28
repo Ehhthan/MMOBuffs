@@ -148,7 +148,8 @@ public class ActiveStatusEffect implements Resolver, Comparable<ActiveStatusEffe
     private ActiveStatusEffect mergeDuration(ActiveStatusEffect latest, Modifier modifier) {
         switch (modifier) {
             case SET -> {
-                return latest;
+                this.duration = Math.max(0, latest.duration);
+                return this;
             }
 
             case KEEP -> {
@@ -180,7 +181,8 @@ public class ActiveStatusEffect implements Resolver, Comparable<ActiveStatusEffe
         int maxStacks = statusEffect.getMaxStacks();
         switch (modifier) {
             case SET -> {
-                return latest;
+                this.stacks = Math.max(0, Math.min(maxStacks, latest.stacks));
+                return this;
             }
 
             case KEEP -> {
