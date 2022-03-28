@@ -39,4 +39,4 @@ sorting:
 # Whether to use a shortened display.
 shorten-duration-display: true
 
-config-version: 2
+config-version: 3
