@@ -138,76 +138,45 @@ public class ActiveStatusEffect implements Resolver, Comparable<ActiveStatusEffe
             "Effects of two different types cannot be merged: %s + %s", statusEffect.getKey(), latest.statusEffect.getKey());
 
         // Merge duration with specified modifier.
-        latest = mergeDuration(latest, durationModifier);
-        // Merge stacks with specified modifier.
-        latest = mergeStacks(latest, stackModifier);
-
-        return latest;
-    }
-
-    private ActiveStatusEffect mergeDuration(ActiveStatusEffect latest, Modifier modifier) {
-        switch (modifier) {
-            case SET -> {
-                this.duration = Math.max(0, latest.duration);
-                return this;
-            }
-
-            case KEEP -> {
-                return this;
-            }
-
+        switch (durationModifier) {
             case REFRESH -> {
                 if (this.duration < latest.duration)
                     this.duration = latest.duration;
-
-                return this;
             }
 
-            case ADD -> {
-                this.duration = Math.max(0, this.duration + latest.duration);
-                return this;
-            }
+            case SET -> this.duration = Math.max(0, latest.duration);
 
-            case SUBTRACT -> {
-                this.duration = Math.max(0, this.duration - latest.duration);
-                return this;
-            }
+            case ADD -> this.duration = Math.max(0, this.duration + latest.duration);
 
-            default -> throw new UnsupportedOperationException("Unexpected value: " + modifier);
+            case SUBTRACT -> this.duration = Math.max(0, this.duration - latest.duration);
+
+            default ->  {
+                if (stackModifier != Modifier.KEEP)
+                    throw new UnsupportedOperationException("Unexpected value: " + durationModifier);
+            }
         }
-    }
 
-    private ActiveStatusEffect mergeStacks(ActiveStatusEffect latest, Modifier modifier) {
         int maxStacks = statusEffect.getMaxStacks();
-        switch (modifier) {
-            case SET -> {
-                this.stacks = Math.max(0, Math.min(maxStacks, latest.stacks));
-                return this;
-            }
-
-            case KEEP -> {
-                return this;
-            }
-
+        // Merge stacks with specified modifier.
+        switch (stackModifier) {
             case REFRESH -> {
                 if (this.stacks < latest.stacks)
                     this.stacks = Math.max(0, Math.min(maxStacks, latest.stacks));
-
-                return this;
             }
 
-            case ADD -> {
-                this.stacks = Math.max(0, Math.min(maxStacks, this.stacks + latest.stacks));
-                return this;
-            }
+            case SET -> this.stacks = Math.max(0, Math.min(maxStacks, latest.stacks));
 
-            case SUBTRACT -> {
-                this.stacks = Math.max(0, Math.min(maxStacks, this.stacks - latest.stacks));
-                return this;
-            }
+            case ADD -> this.stacks = Math.max(0, Math.min(maxStacks, this.stacks + latest.stacks));
 
-            default -> throw new UnsupportedOperationException("Unexpected value: " + modifier);
+            case SUBTRACT -> this.stacks = Math.max(0, Math.min(maxStacks, this.stacks - latest.stacks));
+
+            default ->  {
+                if (stackModifier != Modifier.KEEP)
+                    throw new UnsupportedOperationException("Unexpected value: " + stackModifier);
+            }
         }
+
+        return this;
     }
 
     @Override
