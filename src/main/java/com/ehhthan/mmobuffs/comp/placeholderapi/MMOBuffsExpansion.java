@@ -35,7 +35,10 @@ public class MMOBuffsExpansion extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
-        if (player != null && player.isOnline()) {
+        // Check if the effect holder is loaded and contains the player.
+        // Fixes NightFury's issue:
+        // java.lang.NullPointerException: Cannot invoke ... because "holder" is null
+        if (player != null && player.isOnline() && EffectHolder.has(player.getPlayer())) {
             EffectHolder holder = EffectHolder.get(player.getPlayer());
 
             String[] split = params.split("_", 2);
