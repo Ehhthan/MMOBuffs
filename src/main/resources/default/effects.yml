@@ -3,11 +3,22 @@ strong:
   max-stacks: 4
   stack-type: normal
   stats:
-    defense: 10
-    armor: 1
-    max_health: 2
+    mythiclib:defense: 10
+    mythiclib:armor: 1
+    mythiclib:max_health: 2
   display:
     icon: \uE040
+    text: "<icon> <duration>"
+speedy:
+  display-name: '<green>Speedy'
+  max-stacks: 1
+  stack-type: normal
+  stats:
+    mythiclib:attack_speed: 50%
+    mythiclib:movement_speed: 10%
+    mythiclib:attack_damage: -30%
+  display:
+    icon: \uE025
     text: "<icon> <duration>"
 damage:
   display-name: '<red>Damage'
@@ -18,14 +29,3 @@ damage:
   display:
     icon: \uE021
     text: "<icon> <red><duration>"
-speedy:
-  display-name: '<green>Speedy'
-  max-stacks: 1
-  stack-type: normal
-  stats:
-    attack_speed: 50%
-    movement_speed: 10%
-    attack_damage: -30%
-  display:
-    icon: \uE025
-    text: "<icon> <duration>"

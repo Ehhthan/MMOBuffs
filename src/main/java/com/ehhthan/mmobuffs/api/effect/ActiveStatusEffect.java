@@ -1,6 +1,7 @@
 package com.ehhthan.mmobuffs.api.effect;
 
-import com.ehhthan.mmobuffs.MMOBuffs;
+import com.ehhthan.mmobuffs.api.stat.StatKey;
+import com.ehhthan.mmobuffs.api.stat.StatValue;
 import com.ehhthan.mmobuffs.api.effect.display.duration.DurationDisplay;
 import com.ehhthan.mmobuffs.api.effect.display.duration.TimedDisplay;
 import com.ehhthan.mmobuffs.api.effect.stack.StackType;
@@ -95,7 +96,7 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
         return false;
     }
 
-    public void tickStackEvent(StackType type) {
+    public void triggerStack(StackType type) {
         if (active && type == statusEffect.getStackType()) {
             switch (type) {
                 case ATTACK, HURT, COMBAT -> {
@@ -124,10 +125,8 @@ public class ActiveStatusEffect implements TemplateHolder, Comparable<ActiveStat
         templates.add(Template.of("start-duration", getStartDuration() + ""));
         templates.add(Template.of("start-stacks", getStartStacks() + ""));
 
-        if (MMOBuffs.getInst().hasStatHandler()) {
-            for (Map.Entry<String, String> entry : getStatusEffect().getStats().entrySet()) {
-                templates.add(Template.of("stat:" + entry.getKey(), entry.getValue() + ""));
-            }
+        for (Map.Entry<StatKey, StatValue> entry : getStatusEffect().getStats().entrySet()) {
+            templates.add(Template.of("stat:" + entry.getKey().getStat(), entry.getValue().toString()));
         }
 
         templates.addAll(getStatusEffect().getTemplates());

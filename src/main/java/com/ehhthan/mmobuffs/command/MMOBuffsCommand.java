@@ -99,11 +99,11 @@ public class MMOBuffsCommand extends BaseCommand {
 
         switch (choice) {
             case "all" -> {
-                holder.removeAllEffects(false);
+                holder.removeEffects(false);
                 message = language.getMessage("clear-all-effects", true, templates);
             }
             case "permanent" -> {
-                holder.removeAllEffects(true);
+                holder.removeEffects(true);
                 message = language.getMessage("clear-permanent-effects", true, templates);
             }
             default -> {

@@ -2,6 +2,7 @@ package com.ehhthan.mmobuffs.comp.placeholderapi;
 
 import com.ehhthan.mmobuffs.MMOBuffs;
 import com.ehhthan.mmobuffs.api.EffectHolder;
+import com.ehhthan.mmobuffs.api.stat.StatKey;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.NamespacedKey;
@@ -87,23 +88,28 @@ public class MMOBuffsExpansion extends PlaceholderExpansion {
                     }
 
                     default -> {
-                        String[] optionParams = split[1].split("_", 2);
-                        if (optionParams.length == 2) {
-                            key = NamespacedKey.fromString(optionParams[1].toLowerCase(Locale.ROOT), plugin);
-                            switch (option) {
-                                case "value" -> {
-                                    if (key != null && holder.hasEffect(key))
-                                        return MMOBuffs.getInst().getStatHandler().getValue(holder, key.getKey() + ':' + optionParams[0]);
-                                    else
-                                        return "0";
+                        String[] optionSplit = split[1].split("_", 2);
+                        String[] statSplit = optionSplit[0].split(":", 2);
+                        if (optionSplit.length == 2) {
+                            key = NamespacedKey.fromString(optionSplit[1].toLowerCase(Locale.ROOT), plugin);
+                            if (key != null && holder.hasEffect(key)) {
+                                StatKey statKey;
+                                if (statSplit.length == 1)
+                                    statKey = new StatKey(plugin.getEffectManager().get(key), statSplit[0]);
+                                else if (statSplit.length == 2)
+                                    statKey = new StatKey(plugin.getEffectManager().get(key), statSplit[1], statSplit[0]);
+                                else
+                                    return "0";
+                                switch (option) {
+                                    case "value" -> {
+                                        return plugin.getStatManager().getValue(holder, statKey);
+                                    }
+                                    case "basevalue" -> {
+                                        return holder.getEffect(key).getStatusEffect().getStats().get(statKey).toString();
+                                    }
                                 }
-                                case "basevalue" -> {
-                                    if (key != null && holder.hasEffect(key))
-                                        return holder.getEffect(key).getStatusEffect().getStats().get(optionParams[0]);
-                                    else
-                                        return "0";
-                                }
-                            }
+                            } else
+                                return "0";
                         }
                     }
                 }

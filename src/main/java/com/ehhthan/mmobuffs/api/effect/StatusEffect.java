@@ -1,6 +1,8 @@
 package com.ehhthan.mmobuffs.api.effect;
 
 import com.ehhthan.mmobuffs.MMOBuffs;
+import com.ehhthan.mmobuffs.api.stat.StatKey;
+import com.ehhthan.mmobuffs.api.stat.StatValue;
 import com.ehhthan.mmobuffs.api.effect.display.EffectDisplay;
 import com.ehhthan.mmobuffs.api.effect.option.EffectOption;
 import com.ehhthan.mmobuffs.api.effect.stack.StackType;
@@ -26,7 +28,7 @@ public class StatusEffect implements Keyed, TemplateHolder {
     private final NamespacedKey key;
     private final Component name;
 
-    private final Map<String, String> stats;
+    private final Map<StatKey, StatValue> stats = new LinkedHashMap<>();
     private final Map<EffectOption, Boolean> options = new HashMap<>();
 
     private final int maxStacks;
@@ -40,15 +42,20 @@ public class StatusEffect implements Keyed, TemplateHolder {
         this.name = MiniMessage.get().parse(section.getString("display-name", WordUtils.capitalize(key.getKey())));
 
         if (section.isConfigurationSection("stats")) {
-            this.stats = new LinkedHashMap<>();
-
             ConfigurationSection statSection = section.getConfigurationSection("stats");
-            for (String key : statSection.getKeys(false)) {
-                if (statSection.isSet(key))
-                    stats.put(key.toLowerCase(Locale.ROOT), statSection.getString(key));
+            for (String stat : statSection.getKeys(false)) {
+                String[] split = stat.split(":", 2);
+
+                StatKey statKey;
+                if (split.length == 1)
+                    statKey = new StatKey(this, split[0]);
+                else if (split.length == 2)
+                    statKey = new StatKey(this, split[1], split[0]);
+                else
+                    continue;
+
+                stats.put(statKey, new StatValue(statSection.getString(stat)));
             }
-        } else {
-            this.stats = null;
         }
 
         if (section.isConfigurationSection("options")) {
@@ -76,10 +83,10 @@ public class StatusEffect implements Keyed, TemplateHolder {
     }
 
     public boolean hasStats() {
-        return stats != null && !stats.isEmpty();
+        return !stats.isEmpty();
     }
 
-    public Map<String, String> getStats() {
+    public Map<StatKey, StatValue> getStats() {
         return stats;
     }
 

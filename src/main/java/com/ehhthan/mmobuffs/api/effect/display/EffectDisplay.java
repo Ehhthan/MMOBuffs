@@ -32,7 +32,7 @@ public class EffectDisplay {
         return text;
     }
 
-    public Component build(Player player, @NotNull ActiveStatusEffect effect) {
+    public Component build(@NotNull Player player, @NotNull ActiveStatusEffect effect) {
         List<Template> templates = effect.getTemplates();
         templates.add(Template.of("icon", StringEscapeUtils.unescapeJava(icon)));
 
