@@ -11,6 +11,9 @@ bossbar-display:
   # How often the bossbar should update in ticks.
   update-ticks: 20
 
+  # If the bossbar should continue to display even when the holder has no buffs.
+  display-when-empty: false
+
   # What characters should separate the effects in the bossbar.
   effect-separator: " "
 
