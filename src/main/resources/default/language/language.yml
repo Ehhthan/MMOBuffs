@@ -31,7 +31,7 @@ duration-display:
   # What should separate the time placeholders.
   separator: ' '
 
-  permanent: 'Permanent'
+  permanent: '∞'
 
 list-display:
   header: '<#207d33>⭐-------- <#53d46c><bold>ACTIVE EFFECTS</bold> <#207d33>--------⭐'
