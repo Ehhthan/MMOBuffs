@@ -2,10 +2,10 @@
 
 Options allow you to alter buffs based on in game events.
 
-| Option               | Description                                 | Default Value | Default Value |
-| -------------------- | ------------------------------------------- | ------------- | ------------- |
-| keep-on-death        | If the effect will be removed on death.     | false         |               |
-| keep-on-world-change | If the effect will be kept on world change. | true          |               |
+| Option               | Description                                 | Default Value |
+| -------------------- | ------------------------------------------- | ------------- |
+| keep-on-death        | If the effect will be removed on death.     | false         |
+| keep-on-world-change | If the effect will be kept on world change. | true          |
 
 #### Example Config Section
 

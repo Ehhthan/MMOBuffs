@@ -17,7 +17,13 @@ Handler IDs are important for specifying overlapping stats.
 
 ### Stat Configuration
 
-Stats can be positive or negative as well as include decimals. They can also be a flat increase if just a number or a percentage if there is a percentage sign at the end.
+{% hint style="success" %}
+Stats can be negative and include decimals.
+{% endhint %}
+
+{% hint style="info" %}
+You can use a `%` sign to make the stat a relative percentage change.
+{% endhint %}
 
 #### Example Config
 
