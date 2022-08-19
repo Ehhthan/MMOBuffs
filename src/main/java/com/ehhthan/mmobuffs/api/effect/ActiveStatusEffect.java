@@ -134,7 +134,7 @@ public class ActiveStatusEffect implements Resolver, Comparable<ActiveStatusEffe
     }
 
     public ActiveStatusEffect merge(ActiveStatusEffect latest, Modifier durationModifier, Modifier stackModifier) {
-        Preconditions.checkArgument(statusEffect.getKey() == latest.statusEffect.getKey(),
+        Preconditions.checkArgument(statusEffect.getKey().equals(latest.statusEffect.getKey()),
             "Effects of two different types cannot be merged: %s + %s", statusEffect.getKey(), latest.statusEffect.getKey());
 
         // Merge duration with specified modifier.
