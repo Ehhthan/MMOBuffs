@@ -17,5 +17,5 @@ Commands are essential for applying, removing, and altering a player's effect.
 | /buff list \[player]                                                                                       | List the current effects on a player.                                             | mmobuffs.list      |
 
 {% hint style="info" %}
-If you end the command with `-s` it will execute silently.
+If you end the command with `-s`it will execute silently.
 {% endhint %}
