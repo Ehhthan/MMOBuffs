@@ -118,32 +118,4 @@ public class StatusEffect implements Keyed, Resolver {
 
         return resolver.build();
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        StatusEffect effect = (StatusEffect) o;
-
-        if (maxStacks != effect.maxStacks) return false;
-        if (!key.equals(effect.key)) return false;
-        if (!name.equals(effect.name)) return false;
-        if (!stats.equals(effect.stats)) return false;
-        if (!options.equals(effect.options)) return false;
-        if (stackType != effect.stackType) return false;
-        return Objects.equals(display, effect.display);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = key.hashCode();
-        result = 31 * result + name.hashCode();
-        result = 31 * result + stats.hashCode();
-        result = 31 * result + options.hashCode();
-        result = 31 * result + maxStacks;
-        result = 31 * result + stackType.hashCode();
-        result = 31 * result + (display != null ? display.hashCode() : 0);
-        return result;
-    }
 }

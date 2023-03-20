@@ -86,12 +86,17 @@ public class EffectHolder implements PersistentDataHolder {
     private final BukkitRunnable bossBarUpdater = new BukkitRunnable() {
         @Override
         public void run() {
+            FileConfiguration config = MMOBuffs.getInst().getConfig();
             // Creates a list of the displayable active status effects in ascending order.
+            if (!config.getBoolean("bossbar-display.enabled", true)) {
+                return;
+            }
+
             List<ActiveStatusEffect> sortedEffects = new LinkedList<>(effects.values().stream().filter(e -> e.getStatusEffect().hasDisplay()).sorted().toList());
             if (sortedEffects.size() > 0) {
                 TextComponent.Builder builder = Component.text();
                 // Checks if the effects should be descending and reverses.
-                if (!MMOBuffs.getInst().getConfig().getBoolean("sorting.duration-ascending", true))
+                if (!config.getBoolean("sorting.duration-ascending", true))
                     Collections.reverse(sortedEffects);
 
                 for (int i = 0; i < sortedEffects.size(); i++) {
@@ -107,7 +112,7 @@ public class EffectHolder implements PersistentDataHolder {
                 bossBar.name(builder.build());
                 player.showBossBar(bossBar);
             } else {
-                if (!MMOBuffs.getInst().getConfig().getBoolean("bossbar-display.display-when-empty", false))
+                if (!config.getBoolean("bossbar-display.display-when-empty", false))
                     player.hideBossBar(bossBar);
                 else
                     bossBar.name(Component.empty());
@@ -122,8 +127,9 @@ public class EffectHolder implements PersistentDataHolder {
         this.player = player;
         FileConfiguration config = MMOBuffs.getInst().getConfig();
 
-        if (config.isConfigurationSection("bossbar-display") && config.getBoolean("bossbar-display.enabled", true))
+        if (config.isConfigurationSection("bossbar-display") && config.getBoolean("bossbar-display.enabled", true)) {
             this.bossBar = BAR_SUPPLIER.apply(config.getConfigurationSection("bossbar-display"));
+        }
 
         this.separator = Component.text(config.getString("bossbar-display.effect-separator", " "));
 
@@ -137,8 +143,8 @@ public class EffectHolder implements PersistentDataHolder {
                 }
         }
 
-        effectUpdater.runTaskTimer(MMOBuffs.getInst(), 1, 20);
         bossBarUpdater.runTaskTimer(MMOBuffs.getInst(), 2, MMOBuffs.getInst().getConfig().getInt("bossbar-display.update-ticks", 20));
+        effectUpdater.runTaskTimer(MMOBuffs.getInst(), 1, 20);
 
         if (MMOBuffs.getInst().getConfig().getBoolean("bossbar-display.display-when-empty", false))
             player.showBossBar(bossBar);
