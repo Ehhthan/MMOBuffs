@@ -69,7 +69,7 @@ public class MythicMobsStatHandler implements StatHandler<StatRegistry> {
         Optional<StatType> maybeStat = getExecutor().getStat(key.getStat().toUpperCase(Locale.ROOT));
 
         if (adapted != null && maybeStat.isPresent()) {
-            return adapted.get(maybeStat.get()) + "";
+            return String.valueOf(adapted.get(maybeStat.get()));
         }
 
         return "0";

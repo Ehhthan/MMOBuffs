@@ -5,10 +5,8 @@ import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import com.ehhthan.mmobuffs.api.stat.StatKey;
 import com.ehhthan.mmobuffs.api.stat.StatValue;
 import com.ehhthan.mmobuffs.comp.stat.StatHandler;
-import io.lumine.mythic.lib.api.player.EquipmentSlot;
 import io.lumine.mythic.lib.api.player.MMOPlayerData;
 import io.lumine.mythic.lib.api.stat.modifier.StatModifier;
-import io.lumine.mythic.lib.player.modifier.ModifierSource;
 import io.lumine.mythic.lib.player.modifier.ModifierType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +38,7 @@ public class MythicLibStatHandler implements StatHandler<MMOPlayerData> {
             };
 
             String stat = key.getStat().toUpperCase(Locale.ROOT);
-            adapted.getStatMap().getInstance(stat).registerModifier(new StatModifier(key.getUUID(), key.toString(), stat, modifierValue, adaptModifier(value.getType()), EquipmentSlot.OTHER, ModifierSource.OTHER));
+            adapted.getStatMap().getInstance(stat).addModifier(new StatModifier(key.toString(), stat, modifierValue, adaptModifier(value.getType())));
         }
     }
 
@@ -48,7 +46,7 @@ public class MythicLibStatHandler implements StatHandler<MMOPlayerData> {
     public void remove(@NotNull EffectHolder holder, @NotNull StatKey key) {
         MMOPlayerData adapted = adapt(holder);
         if (adapted != null) {
-            adapted.getStatMap().getInstance(key.getStat().toUpperCase(Locale.ROOT)).removeModifier(key.getUUID());
+            adapted.getStatMap().getInstance(key.getStat().toUpperCase(Locale.ROOT)).remove(key.toString());
         }
     }
 
@@ -57,7 +55,7 @@ public class MythicLibStatHandler implements StatHandler<MMOPlayerData> {
     public String getValue(@NotNull EffectHolder holder, @NotNull StatKey key) {
         MMOPlayerData adapted = adapt(holder);
         if (adapted != null) {
-            StatModifier modifier = adapted.getStatMap().getInstance(key.getStat()).getModifier(key.getUUID());
+            StatModifier modifier = adapted.getStatMap().getInstance(key.getStat()).getModifier(key.toString());
             if (modifier != null)
                 return modifier.toString();
         }
