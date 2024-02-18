@@ -1,5 +1,6 @@
 strong:
   display-name: '<yellow>Strong'
+  description: 'Become strong for a bit!'
   max-stacks: 4
   stack-type: normal
   stats:

@@ -35,5 +35,5 @@ duration-display:
 
 list-display:
   header: '<#207d33>⭐-------- <#53d46c><bold>ACTIVE EFFECTS</bold> <#207d33>--------⭐'
-  effect-element: '<#53d46c><name> <#767d87>: <duration>'
+  effect-element: "<hover:show_text:'<description>'><#53d46c><name></hover> <#767d87>: <duration>"
 

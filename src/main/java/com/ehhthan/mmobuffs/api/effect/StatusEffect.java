@@ -25,6 +25,7 @@ import java.util.Map;
 public class StatusEffect implements Keyed, Resolver {
     private final NamespacedKey key;
     private final Component name;
+    private final Component description;
 
     private final Map<StatKey, StatValue> stats = new LinkedHashMap<>();
     private final Map<EffectOption, Boolean> options = new HashMap<>();
@@ -38,6 +39,7 @@ public class StatusEffect implements Keyed, Resolver {
     public StatusEffect(@NotNull ConfigurationSection section) {
         this.key = NamespacedKey.fromString(section.getName().toLowerCase(Locale.ROOT), MMOBuffs.getInst());
         this.name = MiniMessage.miniMessage().deserialize(section.getString("display-name", WordUtils.capitalize(key.getKey())));
+        this.description = MiniMessage.miniMessage().deserialize(section.getString("description", ""));
 
         if (section.isConfigurationSection("stats")) {
             ConfigurationSection statSection = section.getConfigurationSection("stats");
@@ -80,6 +82,10 @@ public class StatusEffect implements Keyed, Resolver {
         return name;
     }
 
+    public Component getDescription() {
+        return description;
+    }
+
     public boolean hasStats() {
         return !stats.isEmpty();
     }
@@ -113,6 +119,7 @@ public class StatusEffect implements Keyed, Resolver {
         TagResolver.Builder resolver = TagResolver.builder()
             .resolver(Placeholder.parsed("max-stacks", getMaxStacks() + ""))
             .resolver(Placeholder.component("name", name))
+            .resolver(Placeholder.component("description", description))
             .resolver(Placeholder.parsed("stack-type", WordUtils.capitalize(stackType.name().toLowerCase(Locale.ROOT))));
 
         return resolver.build();

@@ -201,6 +201,7 @@ public class MMOBuffsCommand extends BaseCommand {
         components.add(MMOBuffs.getInst().getLanguageManager().getMessage("list-display.header", false));
 
         String text = MMOBuffs.getInst().getLanguageManager().getString("list-display.effect-element");
+
         for (ActiveStatusEffect activeEffect : holder.getEffects(true)) {
             components.add(MiniMessage.miniMessage().deserialize((MMOBuffs.getInst().getParserManager().parse(holder.getPlayer(), text)), activeEffect.getResolver()));
         }
