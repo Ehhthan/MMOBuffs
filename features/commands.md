@@ -15,3 +15,7 @@ Commands are essential for applying, removing, and altering a player's effect.
 | /buff stack \<player> \<effect> \<set\|add\|subtract\|multiply\|divide> \<stacks>                          | Alter the stacks of an effect.                                                    | mmobuffs.stack     |
 | /buff time \<player> \<effect> \<set\|add\|subtract\|multiply\|divide> \<duration>                         | Alter the duration of an effect.                                                  | mmobuffs.time      |
 | /buff list \[player]                                                                                       | List the current effects on a player.                                             | mmobuffs.list      |
+
+{% hint style="info" %}
+If you end the command with `-s`it will execute silently.
+{% endhint %}
