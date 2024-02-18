@@ -6,9 +6,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.UUID;
 
 public class StatKey {
     private static final String NAMESPACE = "mmobuffs";
+    private final UUID uuid = UUID.randomUUID();
 
     private final StatusEffect effect;
 
@@ -41,6 +43,10 @@ public class StatKey {
         // Don't need to specify plugin here because each stat handler stores their stats separately.
         // This means there should never be overlap.
         return NAMESPACE + '.' + effect.getKey().getKey() + '.' + stat;
+    }
+
+    public UUID getUUID() {
+        return uuid;
     }
 
     @Override

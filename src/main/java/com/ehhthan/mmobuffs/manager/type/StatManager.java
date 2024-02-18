@@ -8,6 +8,7 @@ import com.ehhthan.mmobuffs.api.stat.StatValue;
 import com.ehhthan.mmobuffs.comp.stat.StatHandler;
 import com.ehhthan.mmobuffs.comp.stat.type.AureliumSkillsStatHandler;
 import com.ehhthan.mmobuffs.comp.stat.type.MythicLibStatHandler;
+import com.ehhthan.mmobuffs.comp.stat.type.MythicMobsStatHandler;
 import org.bukkit.Bukkit;
 
 import java.util.LinkedHashMap;
@@ -25,6 +26,9 @@ public class StatManager {
 
         if (Bukkit.getPluginManager().getPlugin("AureliumSkills") != null)
             register(new AureliumSkillsStatHandler());
+
+        if (Bukkit.getPluginManager().getPlugin("MythicMobs") != null)
+            register(new MythicMobsStatHandler());
     }
 
     public void register(StatHandler<?> handler) {

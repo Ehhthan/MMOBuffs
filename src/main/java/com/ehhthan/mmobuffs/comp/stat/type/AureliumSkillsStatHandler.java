@@ -1,6 +1,5 @@
 package com.ehhthan.mmobuffs.comp.stat.type;
 
-import com.archyx.aureliumskills.AureliumSkills;
 import com.archyx.aureliumskills.api.AureliumAPI;
 import com.archyx.aureliumskills.data.PlayerData;
 import com.archyx.aureliumskills.modifier.StatModifier;

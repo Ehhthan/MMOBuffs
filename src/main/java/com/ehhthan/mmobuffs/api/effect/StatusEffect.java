@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 public class StatusEffect implements Keyed, Resolver {
     private final NamespacedKey key;
