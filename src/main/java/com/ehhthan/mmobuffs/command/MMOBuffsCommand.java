@@ -17,6 +17,7 @@ import com.ehhthan.mmobuffs.api.effect.ActiveStatusEffect;
 import com.ehhthan.mmobuffs.api.effect.StatusEffect;
 import com.ehhthan.mmobuffs.api.modifier.Modifier;
 import com.ehhthan.mmobuffs.manager.type.LanguageManager;
+import com.ehhthan.mmobuffs.manager.type.ParserManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -34,10 +35,12 @@ import java.util.List;
 public class MMOBuffsCommand extends BaseCommand {
     private final MMOBuffs plugin;
     private final LanguageManager language;
+    private final ParserManager parser;
 
-    public MMOBuffsCommand(MMOBuffs plugin, LanguageManager language) {
+    public MMOBuffsCommand(MMOBuffs plugin, LanguageManager language, ParserManager parser) {
         this.plugin = plugin;
         this.language = language;
+        this.parser = parser;
     }
 
     @Subcommand("reload")
@@ -198,13 +201,15 @@ public class MMOBuffsCommand extends BaseCommand {
                 throw new InvalidCommandArgument("No player specified.");
 
         List<Component> components = new LinkedList<>();
-        components.add(MMOBuffs.getInst().getLanguageManager().getMessage("list-display.header", false));
+        components.add(language.getMessage("list-display.header", false));
 
         String text = MMOBuffs.getInst().getLanguageManager().getString("list-display.effect-element");
 
         for (ActiveStatusEffect activeEffect : holder.getEffects(true)) {
             components.add(MiniMessage.miniMessage().deserialize((MMOBuffs.getInst().getParserManager().parse(holder.getPlayer(), text)), activeEffect.getResolver()));
         }
+
+        components.add(language.getMessage("list-display.footer", false));
 
         TextComponent.Builder builder = Component.text();
         for (int i = 0; i < components.size(); i++) {
@@ -219,7 +224,7 @@ public class MMOBuffsCommand extends BaseCommand {
     @CatchUnknown
     @Description("Catches unknown commands.")
     public void onUnknownCommand(CommandSender sender) {
-        Component message = MMOBuffs.getInst().getLanguageManager().getMessage("unknown-command");
+        Component message = language.getMessage("unknown-command");
         if (message != null)
             sender.sendMessage(message);
     }

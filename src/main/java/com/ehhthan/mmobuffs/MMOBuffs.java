@@ -102,7 +102,7 @@ public final class MMOBuffs extends JavaPlugin {
             return EffectHolder.get(player);
         });
 
-        commandManager.registerCommand(new MMOBuffsCommand(this, languageManager));
+        commandManager.registerCommand(new MMOBuffsCommand(this, languageManager, parserManager));
     }
 
     public void reload() {
